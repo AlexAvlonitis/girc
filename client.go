@@ -27,6 +27,8 @@ type Client struct {
 	RealName string
 	// Conn is the connection to the server
 	Conn *Connection
+	// joined channel
+	Channel string
 }
 
 // NewClient creates a new IRC client
@@ -42,6 +44,7 @@ func NewClient(server string, port int, nick, user, realName string) *Client {
 
 // Connect connects to the IRC server
 func (c *Client) Connect() error {
+	fmt.Println("Connecting to server...")
 	conn, err := net.Dial("tcp", c.Server+":"+strconv.Itoa(c.Port))
 	if err != nil {
 		log.Printf("Error connecting to server: %s", err)
@@ -67,7 +70,7 @@ func (c *Client) Connect() error {
 }
 
 // reads from the connection
-func (c *Client) Read(ch chan []byte) {
+func (c *Client) Read(ch chan []byte, done chan interface{}) {
 	buf := make([]byte, 512)
 	for {
 		n, err := c.Conn.Conn.Read(buf)
@@ -75,7 +78,13 @@ func (c *Client) Read(ch chan []byte) {
 			log.Fatalf("Error reading from connection: %s", err)
 		}
 		fmt.Printf("%s", buf[:n])
-		ch <- buf[:n]
+
+		select {
+		case <-done:
+			return
+		default:
+			ch <- buf[:n]
+		}
 	}
 }
 
