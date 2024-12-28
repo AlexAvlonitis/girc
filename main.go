@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	client := connection.NewClient("halcyon.il.us.dal.net", 6669, "CCClient", "CCClient", "CCClient")
+	client := connection.NewClient()
 	err := client.Connect()
 	if err != nil {
 		log.Fatalf("Error connecting to server: %s", err)

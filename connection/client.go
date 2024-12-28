@@ -32,13 +32,19 @@ type Client struct {
 }
 
 // NewClient creates a new IRC client
-func NewClient(server string, port int, nick, user, realName string) *Client {
+func NewClient() *Client {
+	cfg, err := NewConfiguration()
+	if err != nil {
+		log.Fatalf("Error reading configuration: %s", err)
+		return nil
+	}
+
 	return &Client{
-		Server:   server,
-		Port:     port,
-		Nick:     nick,
-		User:     user,
-		RealName: realName,
+		Server:   cfg.Server,
+		Port:     cfg.Port,
+		Nick:     cfg.Nick,
+		User:     cfg.User,
+		RealName: cfg.RealName,
 	}
 }
 
