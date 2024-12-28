@@ -12,7 +12,7 @@ go run .
 Validate the default connection at http://www.dal.net:9090/.
 
 ## TODO
-[ ] Connect to multiple channels
-[ ] Add some cli beautification
-[ ] Refactor
-[ ] Support all irc client commands
+- [ ] Connect to multiple channels
+- [ ] Add some cli beautification
+- [ ] Refactor
+- [ ] Support all irc client commands
