@@ -1,10 +1,13 @@
-package main
+package commands
 
-import "fmt"
+import (
+	"fmt"
+	"girc/connection"
+)
 
 type PartCommand struct {
 	Input  string
-	Client *Client
+	Client *connection.Client
 }
 
 func (c *PartCommand) Execute() {

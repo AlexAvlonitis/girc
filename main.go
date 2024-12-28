@@ -3,27 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"girc/commands"
+	"girc/connection"
 	"log"
 	"os"
 )
 
-func userInput(ch chan string, done chan interface{}) {
-	for {
-		scanner := bufio.NewScanner(os.Stdin)
-		scanner.Scan()
-		input := scanner.Text()
-
-		select {
-		case <-done:
-			return
-		default:
-			ch <- input
-		}
-	}
-}
-
 func main() {
-	client := NewClient("halcyon.il.us.dal.net", 6669, "CCClient", "CCClient", "CCClient")
+	client := connection.NewClient("halcyon.il.us.dal.net", 6669, "CCClient", "CCClient", "CCClient")
 	err := client.Connect()
 	if err != nil {
 		log.Fatalf("Error connecting to server: %s", err)
@@ -50,8 +37,23 @@ func main() {
 			fmt.Printf("%s\n", msg)
 			fmt.Print("Enter command> ")
 		case userInput := <-userInputCh:
-			SendCommand(userInput, client)
+			commands.SendCommand(userInput, client)
 			fmt.Print("Enter command> ")
+		}
+	}
+}
+
+func userInput(ch chan string, done chan interface{}) {
+	for {
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+		input := scanner.Text()
+
+		select {
+		case <-done:
+			return
+		default:
+			ch <- input
 		}
 	}
 }

@@ -1,10 +1,13 @@
-package main
+package commands
 
-import "fmt"
+import (
+	"fmt"
+	"girc/connection"
+)
 
 type MessageCommand struct {
 	Input  string
-	Client *Client
+	Client *connection.Client
 }
 
 func (c *MessageCommand) Execute() {

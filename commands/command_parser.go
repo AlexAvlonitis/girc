@@ -1,7 +1,8 @@
-package main
+package commands
 
 import (
 	"fmt"
+	"girc/connection"
 	"strings"
 )
 
@@ -14,7 +15,7 @@ func CommandExecute(cmd Command) {
 }
 
 // ParseCommand parses a command and sends the appropriate IRC command
-func SendCommand(input string, client *Client) {
+func SendCommand(input string, client *connection.Client) {
 	if strings.HasPrefix(input, "/") {
 		parts := strings.Split(input, " ")
 
@@ -37,6 +38,7 @@ func SendCommand(input string, client *Client) {
 		default:
 			fmt.Println("\nInvalid command, use /help for more commands")
 		}
+
 		return
 	}
 

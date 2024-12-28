@@ -1,12 +1,13 @@
-package main
+package commands
 
 import (
+	"girc/connection"
 	"strings"
 )
 
 type QuitCommand struct {
 	Input  string
-	Client *Client
+	Client *connection.Client
 }
 
 func (c *QuitCommand) Execute() {

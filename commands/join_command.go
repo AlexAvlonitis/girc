@@ -1,13 +1,14 @@
-package main
+package commands
 
 import (
 	"fmt"
+	"girc/connection"
 	"strings"
 )
 
 type JoinCommand struct {
 	Input  string
-	Client *Client
+	Client *connection.Client
 }
 
 func (c *JoinCommand) Execute() {
