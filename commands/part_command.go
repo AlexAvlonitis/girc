@@ -11,7 +11,7 @@ type PartCommand struct {
 
 func (c *PartCommand) Execute() {
 	if c.Client.Channel == "" {
-		c.Client.PrintMessage("\nYou have not joined a channel")
+		c.Client.PrintMessage("You have not joined that channel")
 		return
 	}
 

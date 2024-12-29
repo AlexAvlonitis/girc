@@ -18,6 +18,6 @@ func (c *NickCommand) Execute() {
 		c.Client.SendCommand(cmd)
 		c.Client.Nick = parts[1]
 	} else {
-		c.Client.PrintMessage("\nInvalid command, use /nick newnick")
+		c.Client.PrintMessage("Invalid command, use /nick newnick")
 	}
 }

@@ -32,7 +32,7 @@ func SendCommand(input string, client *connection.Client) {
 		case "/help":
 			cmd = &HelpCommand{Client: client}
 		default:
-			client.PrintMessage("\nInvalid command, use /help for more commands")
+			client.PrintMessage("Invalid command, use /help for more commands")
 			return
 		}
 

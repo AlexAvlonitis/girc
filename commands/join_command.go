@@ -19,6 +19,6 @@ func (c *JoinCommand) Execute() {
 		c.Client.SendCommand(cmd)
 		c.Client.Channel = channel
 	} else {
-		c.Client.PrintMessage("\nInvalid command, use /join #channel")
+		c.Client.PrintMessage("Invalid command, use /join #channel")
 	}
 }

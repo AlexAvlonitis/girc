@@ -16,6 +16,6 @@ func (c *MessageCommand) Execute() {
 		c.Client.SendCommand(cmd)
 		c.Client.PrintMessage("<" + c.Client.Nick + "> " + c.Input)
 	} else {
-		c.Client.PrintMessage("\nYou need to join a channel first")
+		c.Client.PrintMessage("You need to join a channel first")
 	}
 }
