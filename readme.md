@@ -2,10 +2,11 @@
 
 A simple irc client in go
 
-https://github.com/user-attachments/assets/1ad55622-5a41-4c26-82ce-d03080131021
+![video](https://github.com/user-attachments/assets/496dd54a-a801-4a18-8485-a710f0614c61)
 
 ## How to run
-```
+
+
 # once
 go install
 
