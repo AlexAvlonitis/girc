@@ -14,6 +14,7 @@ func Init() {
 
 	// Create a channel to read messages from the IRC server
 	ch := make(chan []byte)
+	defer close(ch)
 
 	// Create a client and establish a connection
 	client := connection.NewClient(ch, done)
@@ -43,7 +44,7 @@ func Init() {
 	}()
 
 	// Run the application
-	if err := ui.App.SetRoot(ui.Flex, true).SetFocus(ui.MessageInput).Run(); err != nil {
+	if err := ui.App.SetRoot(ui.Grid, true).SetFocus(ui.MessageInput).Run(); err != nil {
 		log.Fatalf("Error running application: %v", err)
 	}
 }

@@ -14,16 +14,15 @@ type Connection struct {
 
 // Client is the main struct for the IRC client
 type Client struct {
-	Server    string           // Server is the server to connect to
-	Port      int              // Port is the port to connect to
-	Nick      string           // Nick is the nickname to use
-	User      string           // User is the username to use
-	RealName  string           // RealName is the real name to use
-	Conn      *Connection      // Conn is the connection to the server
-	Channel   string           // joined channel
-	DoneCh    chan interface{} // done channel
-	ReadCh    chan []byte      // read channel
-	Presenter *Presenter       // presenter formats the received messages
+	Server   string           // Server is the server to connect to
+	Port     int              // Port is the port to connect to
+	Nick     string           // Nick is the nickname to use
+	User     string           // User is the username to use
+	RealName string           // RealName is the real name to use
+	Conn     *Connection      // Conn is the connection to the server
+	Channel  string           // joined channel
+	DoneCh   chan interface{} // done channel
+	ReadCh   chan []byte      // read channel
 }
 
 // NewClient creates a new IRC client
