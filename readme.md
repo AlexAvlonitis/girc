@@ -5,8 +5,7 @@ A simple irc client in go
 https://github.com/user-attachments/assets/446ea04a-dfc7-4862-b499-2e06a4b2220e
 
 ## How to run
-
-
+```
 # once
 go install
 
