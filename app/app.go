@@ -37,13 +37,13 @@ func Init() {
 				return
 			case msg := <-ch:
 				formatted := presenter.FormatMessage(msg)
-				fmt.Fprintf(ui.TextView, "%s\n", formatted)
+				fmt.Fprintf(ui.MessageView, "%s\n", formatted)
 			}
 		}
 	}()
 
 	// Run the application
-	if err := ui.App.SetRoot(ui.Flex, true).SetFocus(ui.InputField).Run(); err != nil {
+	if err := ui.App.SetRoot(ui.Flex, true).SetFocus(ui.MessageInput).Run(); err != nil {
 		log.Fatalf("Error running application: %v", err)
 	}
 }

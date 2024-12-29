@@ -9,11 +9,11 @@ import (
 )
 
 type UI struct {
-	App        *tview.Application
-	TextView   *tview.TextView
-	Flex       *tview.Flex
-	InputField *tview.InputField
-	Client     *connection.Client
+	App          *tview.Application
+	MessageView  *tview.TextView
+	Flex         *tview.Flex
+	MessageInput *tview.InputField
+	Client       *connection.Client
 }
 
 func NewUI(c *connection.Client) *UI {
@@ -21,7 +21,7 @@ func NewUI(c *connection.Client) *UI {
 	ui.App = tview.NewApplication()
 
 	// Create the TextView to display messages
-	ui.TextView = tview.NewTextView().
+	ui.MessageView = tview.NewTextView().
 		SetDynamicColors(true).
 		SetRegions(true).
 		SetWordWrap(true).
@@ -30,20 +30,20 @@ func NewUI(c *connection.Client) *UI {
 		})
 
 	// Set up a border and title for the text view
-	ui.TextView.SetBorder(true).SetTitle("GIRC Client")
+	ui.MessageView.SetBorder(true).SetTitle("GIRC Client")
 
 	// Create the InputField for user input
-	ui.InputField = tview.NewInputField().
+	ui.MessageInput = tview.NewInputField().
 		SetLabel("Input: ").
 		SetFieldWidth(0).
 		SetAcceptanceFunc(tview.InputFieldMaxLength(170)).
 		SetDoneFunc(func(key tcell.Key) {
 			if key == tcell.KeyEnter {
-				text := ui.InputField.GetText()
+				text := ui.MessageInput.GetText()
 				if len(text) > 0 {
 					commands.SendCommand(text, ui.Client)
 					// Clear the input field after sending
-					ui.InputField.SetText("") // Clear the input field
+					ui.MessageInput.SetText("") // Clear the input field
 				}
 			}
 		})
@@ -51,18 +51,18 @@ func NewUI(c *connection.Client) *UI {
 	// Create a flex layout to arrange the text view and input field
 	ui.Flex = tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(ui.TextView, 0, 1, true).
-		AddItem(ui.InputField, 3, 0, false)
+		AddItem(ui.MessageView, 0, 1, true).
+		AddItem(ui.MessageInput, 3, 0, false)
 
 	// Capture keyboard events and navigate between the widgets
 	ui.App.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyTab: // Tab key
 			// When Tab is pressed, move the focus to the InputField
-			if ui.App.GetFocus() == ui.TextView {
-				ui.App.SetFocus(ui.InputField)
+			if ui.App.GetFocus() == ui.MessageView {
+				ui.App.SetFocus(ui.MessageInput)
 			} else {
-				ui.App.SetFocus(ui.TextView)
+				ui.App.SetFocus(ui.MessageView)
 			}
 		case tcell.KeyCtrlC: // Ctrl+C to quit the application
 			// Stop the application on Ctrl+C
@@ -72,7 +72,7 @@ func NewUI(c *connection.Client) *UI {
 		return event
 	})
 
-	ui.TextView.ScrollToEnd()
+	ui.MessageView.ScrollToEnd()
 
 	return ui
 }
