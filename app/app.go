@@ -23,6 +23,9 @@ func Init() {
 		return
 	}
 
+	// Create a presenter to format incoming messages
+	presenter := connection.NewPresenter(client)
+
 	// Initialize the ui
 	ui := ui.NewUI(client)
 
@@ -33,7 +36,7 @@ func Init() {
 			case <-done:
 				return
 			case msg := <-ch:
-				formatted := client.Presenter.FormatMessage(msg)
+				formatted := presenter.FormatMessage(msg)
 				fmt.Fprintf(ui.TextView, "%s\n", formatted)
 			}
 		}

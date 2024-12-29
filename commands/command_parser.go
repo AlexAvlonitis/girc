@@ -27,6 +27,8 @@ func SendCommand(input string, client *connection.Client) {
 			cmd = &PartCommand{Input: input, Client: client}
 		case "/nick":
 			cmd = &NickCommand{Input: input, Client: client}
+		case "/msg":
+			cmd = &PersonalMessageCommand{Input: input, Client: client}
 		case "/quit", "/exit", "/bye", "/q":
 			cmd = &QuitCommand{Input: input, Client: client}
 		case "/help":

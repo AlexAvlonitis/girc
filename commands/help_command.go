@@ -13,6 +13,7 @@ func (c *HelpCommand) Execute() {
 	msg += "/join #channel - join a channel\n"
 	msg += "/part #channel - leave a channel\n"
 	msg += "/nick newnick - change your nickname\n"
+	msg += "/msg nickname message - send a private message\n"
 	msg += "/quit - quit the server\n"
 
 	c.Client.PrintMessage(msg)

@@ -34,16 +34,14 @@ func NewClient(ch chan []byte, done chan interface{}) *Client {
 		return nil
 	}
 
-	presenter := NewPresenter()
 	return &Client{
-		Server:    cfg.Server,
-		Port:      cfg.Port,
-		Nick:      cfg.Nick,
-		User:      cfg.User,
-		RealName:  cfg.RealName,
-		DoneCh:    done,
-		ReadCh:    ch,
-		Presenter: presenter,
+		Server:   cfg.Server,
+		Port:     cfg.Port,
+		Nick:     cfg.Nick,
+		User:     cfg.User,
+		RealName: cfg.RealName,
+		DoneCh:   done,
+		ReadCh:   ch,
 	}
 }
 
@@ -60,12 +58,14 @@ func (c *Client) Connect() error {
 		Conn: conn,
 	}
 
+	// Send NICKname
 	_, err = conn.Write([]byte("NICK " + c.Nick + "\r\n"))
 	if err != nil {
 		log.Printf("Error writing to connection: %s", err)
 		return err
 	}
 
+	// Send USERname
 	_, err = conn.Write([]byte("USER " + c.User + " 0 * :" + c.RealName + "\r\n"))
 	if err != nil {
 		log.Printf("Error writing to connection: %s", err)
