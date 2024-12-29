@@ -48,7 +48,7 @@ func NewClient(ch chan []byte, done chan interface{}) *Client {
 // and starts reading from the connection
 func (c *Client) Connect() error {
 	fmt.Println("Connecting to server...")
-	conn, err := net.Dial("tcp", c.Server+":"+strconv.Itoa(c.Port))
+	conn, err := net.Dial("tcp4", c.Server+":"+strconv.Itoa(c.Port))
 	if err != nil {
 		log.Printf("Error connecting to server: %s", err)
 	}

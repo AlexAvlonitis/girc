@@ -52,8 +52,19 @@ func Init() {
 			case <-done:
 				return
 			case msg := <-ch:
-				formatted := presenter.FormatMessage(msg)
-				fmt.Fprintf(ui.MessageView, "%s\n", formatted)
+				message := presenter.FormatMessage(msg)
+
+				switch message.Type {
+				case "join":
+					names := presenter.NamesToList(message.Content)
+					ui.UsersView.Clear()
+					for _, name := range names {
+						ui.UsersView.AddItem(name, "", 0, nil)
+					}
+					ui.App.Draw()
+				default:
+					fmt.Fprintf(ui.MessageView, "%s\n", message.Content)
+				}
 			}
 		}
 	}()
