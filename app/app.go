@@ -40,7 +40,7 @@ func Init() {
 	}()
 
 	// Run the application
-	if err := ui.App.SetRoot(ui.Flex, true).Run(); err != nil {
+	if err := ui.App.SetRoot(ui.Flex, true).SetFocus(ui.InputField).Run(); err != nil {
 		log.Fatalf("Error running application: %v", err)
 	}
 }

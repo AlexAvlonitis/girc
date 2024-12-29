@@ -72,9 +72,6 @@ func NewUI(c *connection.Client) *UI {
 		return event
 	})
 
-	// Set the focus to the inputField when the application starts
-	ui.App.SetFocus(ui.InputField)
-
 	ui.TextView.ScrollToEnd()
 
 	return ui
