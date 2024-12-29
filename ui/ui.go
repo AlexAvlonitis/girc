@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"girc/commands"
 	"girc/connection"
 
 	"github.com/gdamore/tcell/v2"
@@ -44,17 +43,7 @@ func NewUI(c *connection.Client) *UI {
 	ui.MessageInput = tview.NewInputField().
 		SetLabel("Input: ").
 		SetFieldWidth(0).
-		SetAcceptanceFunc(tview.InputFieldMaxLength(170)).
-		SetDoneFunc(func(key tcell.Key) {
-			if key == tcell.KeyEnter {
-				text := ui.MessageInput.GetText()
-				if len(text) > 0 {
-					commands.SendCommand(text, ui.Client)
-					// Clear the input field after sending
-					ui.MessageInput.SetText("") // Clear the input field
-				}
-			}
-		})
+		SetAcceptanceFunc(tview.InputFieldMaxLength(170))
 
 	// Create a grid layout to arrange the text view, list view, and input field
 	ui.Grid = tview.NewGrid().

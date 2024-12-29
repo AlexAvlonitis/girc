@@ -97,7 +97,7 @@ func (c *Client) Read() {
 }
 
 // SendCommand sends a message/command to the irc server
-func (c *Client) SendCommand(msg string) {
+func (c *Client) Write(msg string) {
 	_, err := c.Conn.Conn.Write([]byte(msg))
 	if err != nil {
 		log.Printf("Error writing to connection: %s", err)

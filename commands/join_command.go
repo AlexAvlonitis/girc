@@ -16,7 +16,7 @@ func (c *JoinCommand) Execute() {
 	if len(parts) > 1 {
 		channel := parts[1]
 		cmd := "JOIN :" + channel + "\r\n"
-		c.Client.SendCommand(cmd)
+		c.Client.Write(cmd)
 		c.Client.Channel = channel
 	} else {
 		c.Client.PrintMessage("Invalid command, use /join #channel")

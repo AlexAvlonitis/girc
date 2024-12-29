@@ -16,6 +16,6 @@ func (c *PartCommand) Execute() {
 	}
 
 	cmd := "PART " + c.Client.Channel + "\r\n"
-	c.Client.SendCommand(cmd)
+	c.Client.Write(cmd)
 	c.Client.Channel = ""
 }

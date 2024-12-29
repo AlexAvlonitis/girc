@@ -2,9 +2,12 @@ package app
 
 import (
 	"fmt"
+	"girc/commands"
 	"girc/connection"
 	"girc/ui"
 	"log"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 func Init() {
@@ -24,11 +27,23 @@ func Init() {
 		return
 	}
 
-	// Create a presenter to format incoming messages
-	presenter := connection.NewPresenter(client)
-
 	// Initialize the ui
 	ui := ui.NewUI(client)
+
+	// Set what happens when the user presses Enter on the input
+	ui.MessageInput.SetDoneFunc(func(key tcell.Key) {
+		if key == tcell.KeyEnter {
+			text := ui.MessageInput.GetText()
+			if len(text) > 0 {
+				commands.SendCommand(text, client)
+				// Clear the input field after sending
+				ui.MessageInput.SetText("") // Clear the input field
+			}
+		}
+	})
+
+	// Create a presenter to format incoming messages
+	presenter := connection.NewPresenter(client)
 
 	// Run the main application loop
 	go func() {

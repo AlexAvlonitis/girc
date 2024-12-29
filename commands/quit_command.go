@@ -15,9 +15,9 @@ func (c *QuitCommand) Execute() {
 
 	if len(parts) > 1 {
 		cmd := "QUIT :" + parts[1] + "\r\n"
-		c.Client.SendCommand(cmd)
+		c.Client.Write(cmd)
 	} else {
 		cmd := "QUIT :Bye bye\r\n"
-		c.Client.SendCommand(cmd)
+		c.Client.Write(cmd)
 	}
 }
