@@ -16,6 +16,7 @@ func (c *NickCommand) Execute() {
 	if len(parts) > 1 {
 		cmd := "NICK :" + parts[1] + "\r\n"
 		c.Client.SendCommand(cmd)
+		c.Client.Nick = parts[1]
 	} else {
 		c.Client.PrintMessage("\nInvalid command, use /nick newnick")
 	}
