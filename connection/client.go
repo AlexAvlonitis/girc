@@ -29,10 +29,14 @@ type Client struct {
 	Conn *Connection
 	// joined channel
 	Channel string
+	// done channel
+	DoneCh chan interface{}
+	// read channel
+	ReadCh chan []byte
 }
 
 // NewClient creates a new IRC client
-func NewClient() *Client {
+func NewClient(ch chan []byte, done chan interface{}) *Client {
 	cfg, err := NewConfiguration()
 	if err != nil {
 		log.Fatalf("Error reading configuration: %s", err)
@@ -45,6 +49,8 @@ func NewClient() *Client {
 		Nick:     cfg.Nick,
 		User:     cfg.User,
 		RealName: cfg.RealName,
+		DoneCh:   done,
+		ReadCh:   ch,
 	}
 }
 
@@ -72,11 +78,12 @@ func (c *Client) Connect() error {
 		return err
 	}
 
+	go c.Read()
 	return nil
 }
 
 // reads from the connection
-func (c *Client) Read(ch chan []byte, done chan interface{}) {
+func (c *Client) Read() {
 	buf := make([]byte, 512)
 	for {
 		n, err := c.Conn.Conn.Read(buf)
@@ -86,20 +93,25 @@ func (c *Client) Read(ch chan []byte, done chan interface{}) {
 		fmt.Printf("%s", buf[:n])
 
 		select {
-		case <-done:
+		case <-c.DoneCh:
 			return
 		default:
-			ch <- buf[:n]
+			c.ReadCh <- buf[:n]
 		}
 	}
 }
 
-// write to connection
-func (c *Client) Write(msg string) {
+// SendCommand sends a message/command to the irc server
+func (c *Client) SendCommand(msg string) {
 	_, err := c.Conn.Conn.Write([]byte(msg))
 	if err != nil {
 		log.Printf("Error writing to connection: %s", err)
 	}
+}
+
+// PrintMessage prints the message to the console via the channel
+func (c *Client) PrintMessage(msg string) {
+	c.ReadCh <- []byte(msg)
 }
 
 // Close closes the connection to the server

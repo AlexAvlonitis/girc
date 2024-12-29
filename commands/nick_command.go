@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"girc/connection"
 	"strings"
 )
@@ -16,8 +15,8 @@ func (c *NickCommand) Execute() {
 
 	if len(parts) > 1 {
 		cmd := "NICK :" + parts[1] + "\r\n"
-		c.Client.Write(cmd)
+		c.Client.SendCommand(cmd)
 	} else {
-		fmt.Println("\nInvalid command, use /nick newnick")
+		c.Client.PrintMessage("\nInvalid command, use /nick newnick")
 	}
 }

@@ -1,13 +1,19 @@
 package commands
 
-import "fmt"
+import (
+	"girc/connection"
+)
 
-type HelpCommand struct{}
+type HelpCommand struct {
+	Client *connection.Client
+}
 
 func (c *HelpCommand) Execute() {
-	fmt.Println("Commands:")
-	fmt.Println("/join #channel - join a channel")
-	fmt.Println("/part #channel- leave a channel")
-	fmt.Println("/nick newnick - change your nickname")
-	fmt.Println("/quit - quit the server")
+	msg := "Commands:\n"
+	msg += "/join #channel - join a channel\n"
+	msg += "/part #channel- leave a channel\n"
+	msg += "/nick newnick - change your nickname\n"
+	msg += "/quit - quit the server\n"
+
+	c.Client.PrintMessage(msg)
 }

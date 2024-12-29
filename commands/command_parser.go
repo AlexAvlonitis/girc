@@ -17,7 +17,7 @@ func CommandExecute(cmd Command) {
 // ParseCommand parses a command and sends the appropriate IRC command
 func SendCommand(input string, client *connection.Client) {
 	var cmd Command
-
+	// Check if the input is a command
 	if strings.HasPrefix(input, "/") {
 		parts := strings.Split(input, " ")
 
@@ -28,10 +28,10 @@ func SendCommand(input string, client *connection.Client) {
 			cmd = &PartCommand{Input: input, Client: client}
 		case "/nick":
 			cmd = &NickCommand{Input: input, Client: client}
-		case "/quit":
+		case "/quit", "/exit", "/bye", "/q":
 			cmd = &QuitCommand{Input: input, Client: client}
 		case "/help":
-			cmd = &HelpCommand{}
+			cmd = &HelpCommand{Client: client}
 		default:
 			fmt.Println("\nInvalid command, use /help for more commands")
 			return

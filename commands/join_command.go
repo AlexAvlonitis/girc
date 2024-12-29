@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"girc/connection"
 	"strings"
 )
@@ -17,9 +16,9 @@ func (c *JoinCommand) Execute() {
 	if len(parts) > 1 {
 		channel := parts[1]
 		cmd := "JOIN :" + channel + "\r\n"
-		c.Client.Write(cmd)
+		c.Client.SendCommand(cmd)
 		c.Client.Channel = channel
 	} else {
-		fmt.Println("\nInvalid command, use /join #channel")
+		c.Client.PrintMessage("\nInvalid command, use /join #channel")
 	}
 }
