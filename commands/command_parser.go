@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"girc/connection"
 	"strings"
 )
@@ -33,7 +32,7 @@ func SendCommand(input string, client *connection.Client) {
 		case "/help":
 			cmd = &HelpCommand{Client: client}
 		default:
-			fmt.Println("\nInvalid command, use /help for more commands")
+			client.PrintMessage("\nInvalid command, use /help for more commands")
 			return
 		}
 

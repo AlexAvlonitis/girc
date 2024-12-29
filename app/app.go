@@ -33,8 +33,8 @@ func Init() {
 			case <-done:
 				return
 			case msg := <-ch:
-				// When a message is received, update the text view
-				fmt.Fprintf(ui.TextView, "%s\n", string(msg))
+				formatted := client.Presenter.FormatMessage(msg)
+				fmt.Fprintf(ui.TextView, "%s\n", formatted)
 			}
 		}
 	}()

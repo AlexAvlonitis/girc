@@ -9,9 +9,9 @@ type HelpCommand struct {
 }
 
 func (c *HelpCommand) Execute() {
-	msg := "Commands:\n"
+	msg := "\nCommands:\n"
 	msg += "/join #channel - join a channel\n"
-	msg += "/part #channel- leave a channel\n"
+	msg += "/part #channel - leave a channel\n"
 	msg += "/nick newnick - change your nickname\n"
 	msg += "/quit - quit the server\n"
 
