@@ -30,7 +30,7 @@ func NewUI(c *connection.Client) *UI {
 		})
 
 	// Set up a border and title for the text view
-	ui.TextView.SetBorder(true).SetTitle("G-IRC Client")
+	ui.TextView.SetBorder(true).SetTitle("GIRC Client")
 
 	// Create the InputField for user input
 	ui.InputField = tview.NewInputField().

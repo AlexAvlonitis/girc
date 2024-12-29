@@ -78,27 +78,29 @@ func (c *Client) Connect() error {
 		return err
 	}
 
-	go c.Read()
+	c.Read()
 	return nil
 }
 
-// reads from the connection
+// Read reads from the connection
 func (c *Client) Read() {
-	buf := make([]byte, 512)
-	for {
-		n, err := c.Conn.Conn.Read(buf)
-		if err != nil {
-			log.Fatalf("Error reading from connection: %s", err)
-		}
-		fmt.Printf("%s", buf[:n])
+	buf := make([]byte, 4096)
 
-		select {
-		case <-c.DoneCh:
-			return
-		default:
-			c.ReadCh <- buf[:n]
+	go func() {
+		for {
+			n, err := c.Conn.Conn.Read(buf)
+			if err != nil {
+				log.Fatalf("Error reading from connection: %s", err)
+			}
+
+			select {
+			case <-c.DoneCh:
+				return
+			default:
+				c.ReadCh <- buf[:n]
+			}
 		}
-	}
+	}()
 }
 
 // SendCommand sends a message/command to the irc server
