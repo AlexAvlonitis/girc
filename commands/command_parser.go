@@ -19,12 +19,13 @@ func SendCommand(input string, client *connection.Client) {
 
 	// Define a map of command strings to their corresponding command structs
 	commandMap := map[string]Command{
-		"/join": &JoinCommand{Input: input, Client: client},
-		"/part": &PartCommand{Input: input, Client: client},
-		"/nick": &NickCommand{Input: input, Client: client},
-		"/msg":  &PersonalMessageCommand{Input: input, Client: client},
-		"/quit": &QuitCommand{Input: input, Client: client},
-		"/help": &HelpCommand{Client: client},
+		"/join":  &JoinCommand{Input: input, Client: client},
+		"/part":  &PartCommand{Input: input, Client: client},
+		"/nick":  &NickCommand{Input: input, Client: client},
+		"/msg":   &PersonalMessageCommand{Input: input, Client: client},
+		"/names": &NamesCommand{Input: input, Client: client},
+		"/quit":  &QuitCommand{Input: input, Client: client},
+		"/help":  &HelpCommand{Client: client},
 	}
 
 	// Check if the input is a command
