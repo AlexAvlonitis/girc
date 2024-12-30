@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"girc/connection"
 	"strings"
 )
@@ -11,13 +12,23 @@ type NickCommand struct {
 }
 
 func (c *NickCommand) Execute() {
+	cmd, err := c.Print()
+	if err != nil {
+		c.Client.PrintMessage(err.Error())
+		return
+	}
+
+	c.Client.Write(cmd)
+	c.Client.Nick = strings.Split(c.Input, " ")[1]
+}
+
+func (c *NickCommand) Print() (string, error) {
 	parts := strings.Split(c.Input, " ")
 
 	if len(parts) > 1 {
 		cmd := "NICK :" + parts[1] + "\r\n"
-		c.Client.Write(cmd)
-		c.Client.Nick = parts[1]
+		return cmd, nil
 	} else {
-		c.Client.PrintMessage("Invalid command, use /nick newnick")
+		return "", errors.New("invalid command, use /nick newnick")
 	}
 }

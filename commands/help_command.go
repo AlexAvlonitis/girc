@@ -9,6 +9,11 @@ type HelpCommand struct {
 }
 
 func (c *HelpCommand) Execute() {
+	cmd, _ := c.Print()
+	c.Client.PrintMessage(cmd)
+}
+
+func (c *HelpCommand) Print() (string, error) {
 	msg := "Commands:\n"
 	msg += "/join #channel - join a channel\n"
 	msg += "/part #channel - leave a channel\n"
@@ -16,5 +21,5 @@ func (c *HelpCommand) Execute() {
 	msg += "/msg nickname message - send a private message\n"
 	msg += "/quit - quit the server\n"
 
-	c.Client.PrintMessage(msg)
+	return msg, nil
 }

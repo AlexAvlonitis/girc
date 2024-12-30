@@ -1,8 +1,8 @@
 package commands
 
 import (
+	"errors"
 	"girc/connection"
-	"strings"
 )
 
 type MessageCommand struct {
@@ -11,33 +11,21 @@ type MessageCommand struct {
 }
 
 func (c *MessageCommand) Execute() {
-	// check if the channel is set and send the message, otherwise print an error
+	cmd, err := c.Print()
+	if err != nil {
+		c.Client.PrintMessage(err.Error())
+		return
+	}
+
+	c.Client.Write(cmd)
+	c.Client.PrintMessage("<" + c.Client.Nick + "> " + c.Input)
+}
+
+func (c *MessageCommand) Print() (string, error) {
 	if c.Client.Channel != "" {
 		cmd := "PRIVMSG " + c.Client.Channel + " :" + c.Input + "\r\n"
-		c.Client.Write(cmd)
-		c.Client.PrintMessage("<" + c.Client.Nick + "> " + c.Input)
+		return cmd, nil
 	} else {
-		c.Client.PrintMessage("You need to join a channel first")
-	}
-}
-
-type PersonalMessageCommand struct {
-	Input  string
-	Client *connection.Client
-}
-
-func (c *PersonalMessageCommand) Execute() {
-	// check if the channel is set and send the message, otherwise print an error
-	if c.Client.Channel != "" {
-		parts := strings.Split(c.Input, " ")
-		if len(parts) > 2 {
-			cmd := "PRIVMSG " + parts[1] + " :" + strings.Join(parts[2:], " ") + "\r\n"
-			c.Client.Write(cmd)
-			c.Client.PrintMessage("<" + c.Client.Nick + ">(Private) " + strings.Join(parts[2:], " "))
-		} else {
-			c.Client.PrintMessage("Invalid command, use /msg nickname message")
-		}
-	} else {
-		c.Client.PrintMessage("You need to join a channel first")
+		return "", errors.New("you need to join a channel first")
 	}
 }

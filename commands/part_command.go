@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"girc/connection"
 )
 
@@ -10,12 +11,20 @@ type PartCommand struct {
 }
 
 func (c *PartCommand) Execute() {
-	if c.Client.Channel == "" {
-		c.Client.PrintMessage("You have not joined that channel")
+	cmd, err := c.Print()
+	if err != nil {
+		c.Client.PrintMessage(err.Error())
 		return
 	}
 
-	cmd := "PART " + c.Client.Channel + "\r\n"
 	c.Client.Write(cmd)
 	c.Client.Channel = ""
+}
+
+func (c *PartCommand) Print() (string, error) {
+	if c.Client.Channel == "" {
+		return "", errors.New("you have not joined that channel")
+	}
+
+	return "PART " + c.Client.Channel + "\r\n", nil
 }

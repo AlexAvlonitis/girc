@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"girc/connection"
 	"strings"
 )
@@ -11,12 +12,22 @@ type NamesCommand struct {
 }
 
 func (c *NamesCommand) Execute() {
+	cmd, err := c.Print()
+	if err != nil {
+		c.Client.PrintMessage(err.Error())
+		return
+	}
+
+	c.Client.Write(cmd)
+}
+
+func (c *NamesCommand) Print() (string, error) {
 	parts := strings.Split(c.Input, " ")
 
 	if len(parts) > 1 {
 		cmd := "NAMES " + parts[1] + "\r\n"
-		c.Client.Write(cmd)
+		return cmd, nil
 	} else {
-		c.Client.PrintMessage("Invalid command, use /names #channel")
+		return "", errors.New("invalid command, use /names #channel")
 	}
 }

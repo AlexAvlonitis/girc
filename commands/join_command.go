@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"girc/connection"
 	"strings"
 )
@@ -11,14 +12,23 @@ type JoinCommand struct {
 }
 
 func (c *JoinCommand) Execute() {
+	cmd, err := c.Print()
+	if err != nil {
+		c.Client.PrintMessage(err.Error())
+		return
+	}
+
+	c.Client.Write(cmd)
+	c.Client.Channel = strings.Split(c.Input, " ")[1]
+}
+
+func (c *JoinCommand) Print() (string, error) {
 	parts := strings.Split(c.Input, " ")
 
 	if len(parts) > 1 {
 		channel := parts[1]
-		cmd := "JOIN :" + channel + "\r\n"
-		c.Client.Write(cmd)
-		c.Client.Channel = channel
+		return "JOIN :" + channel + "\r\n", nil
 	} else {
-		c.Client.PrintMessage("Invalid command, use /join #channel")
+		return "", errors.New("invalid command, use /join #channel")
 	}
 }
