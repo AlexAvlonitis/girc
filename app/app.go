@@ -55,6 +55,8 @@ func Init() {
 				message := presenter.FormatMessage(msg)
 
 				switch message.Type {
+				case "ping":
+					client.SendPong(message.Content)
 				case "join":
 					names := presenter.NamesToList(message.Content)
 					ui.UsersView.Clear()

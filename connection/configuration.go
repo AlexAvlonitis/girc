@@ -12,6 +12,7 @@ type Configuration struct {
 	Port     int    `yaml:"port"`
 	Nick     string `yaml:"nick"`
 	User     string `yaml:"user"`
+	Ssl      bool   `yaml:"ssl"`
 	RealName string `yaml:"realName"`
 }
 

@@ -1,6 +1,7 @@
 ---
-server: "halcyon.il.us.dal.net"
-port: 6667
+server: "eos.ircn.gr"
+port: 6699
 nick: "gircClient"
-user: "gircClient"
-realName: "gircClient"
+user: "girc"
+realName: "girc Client"
+ssl: true

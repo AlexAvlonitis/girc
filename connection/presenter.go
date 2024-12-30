@@ -30,6 +30,8 @@ func (p *Presenter) FormatMessage(msg []byte) *Message {
 		return &Message{Content: p.formatNickChange(s), Type: "nick"}
 	} else if strings.Contains(s, "JOIN") {
 		return &Message{Content: p.formatNamesList(s), Type: "join"}
+	} else if strings.Contains(s, "PING") {
+		return &Message{Content: p.formatPing(s), Type: "ping"}
 	}
 
 	return &Message{Content: s, Type: "unknown"}
@@ -69,4 +71,9 @@ func (p *Presenter) formatNamesList(msg string) string {
 	names := strings.Join(secondRow[6:], " ")
 
 	return names
+}
+
+// format ping messages, get the message after the PING
+func (p *Presenter) formatPing(msg string) string {
+	return msg[5:]
 }
