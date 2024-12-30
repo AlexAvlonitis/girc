@@ -57,13 +57,15 @@ func Init() {
 				switch message.Type {
 				case "ping":
 					client.SendPong(message.Content)
+				// TODO: get the names of a channel
 				case "join":
-					names := presenter.NamesToList(message.Content)
-					ui.UsersView.Clear()
-					for _, name := range names {
-						ui.UsersView.AddItem(name, "", 0, nil)
-					}
-					ui.App.Draw()
+					fmt.Fprintf(ui.MessageView, "%s\n", message.Content)
+					// names := presenter.NamesToList(message.Content)
+					// ui.UsersView.Clear()
+					// for _, name := range names {
+					// 	ui.UsersView.AddItem(name, "", 0, nil)
+					// }
+					// ui.App.Draw()
 				default:
 					fmt.Fprintf(ui.MessageView, "%s\n", message.Content)
 				}

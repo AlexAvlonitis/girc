@@ -13,35 +13,32 @@ func CommandExecute(cmd Command) {
 	cmd.Execute()
 }
 
-// ParseCommand parses a command and sends the appropriate IRC command
+// SendCommand parses a command and sends the appropriate IRC command
 func SendCommand(input string, client *connection.Client) {
 	var cmd Command
+
+	// Define a map of command strings to their corresponding command structs
+	commandMap := map[string]Command{
+		"/join": &JoinCommand{Input: input, Client: client},
+		"/part": &PartCommand{Input: input, Client: client},
+		"/nick": &NickCommand{Input: input, Client: client},
+		"/msg":  &PersonalMessageCommand{Input: input, Client: client},
+		"/quit": &QuitCommand{Input: input, Client: client},
+		"/help": &HelpCommand{Client: client},
+	}
+
 	// Check if the input is a command
 	if strings.HasPrefix(input, "/") {
 		parts := strings.Split(input, " ")
-
-		switch parts[0] {
-		case "/join":
-			cmd = &JoinCommand{Input: input, Client: client}
-		case "/part":
-			cmd = &PartCommand{Input: input, Client: client}
-		case "/nick":
-			cmd = &NickCommand{Input: input, Client: client}
-		case "/msg":
-			cmd = &PersonalMessageCommand{Input: input, Client: client}
-		case "/quit", "/exit", "/bye", "/q":
-			cmd = &QuitCommand{Input: input, Client: client}
-		case "/help":
-			cmd = &HelpCommand{Client: client}
-		default:
+		if command, exists := commandMap[parts[0]]; exists {
+			cmd = command
+		} else {
 			client.PrintMessage("Invalid command, use /help for more commands")
 			return
 		}
-
-		CommandExecute(cmd)
-		return
+	} else {
+		cmd = &MessageCommand{Input: input, Client: client}
 	}
 
-	cmd = &MessageCommand{Input: input, Client: client}
 	CommandExecute(cmd)
 }

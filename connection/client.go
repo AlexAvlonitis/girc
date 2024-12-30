@@ -80,19 +80,9 @@ func (c *Client) Connect() error {
 	conn := NewConnection(c)
 	c.Conn = conn
 
-	// Send NICKname
-	_, err := conn.Conn.Write([]byte("NICK " + c.Nick + "\r\n"))
-	fmt.Println("NICK " + c.Nick + "\r\n")
+	err := c.Register(c.Channel)
 	if err != nil {
-		log.Printf("Error writing to connection: %s", err)
-		return err
-	}
-
-	// Send USERname
-	_, err = conn.Conn.Write([]byte("USER " + c.User + " 0 * :" + c.RealName + "\r\n"))
-	fmt.Println("USER " + c.User + " 0 * :" + c.RealName + "\r\n")
-	if err != nil {
-		log.Printf("Error writing to connection: %s", err)
+		log.Fatalf("Error registering with server: %s", err)
 		return err
 	}
 
@@ -124,6 +114,25 @@ func (c *Client) Read() {
 // SendPong sends a PONG message to the server, to keep the connection alive
 func (c *Client) SendPong(msg string) {
 	c.Write("PONG " + msg)
+}
+
+// Register sends the NICK and USER commands to the server, to register the client
+func (c *Client) Register(channel string) error {
+	// Send NICKname
+	_, err := c.Conn.Conn.Write([]byte("NICK " + c.Nick + "\r\n"))
+	fmt.Println("NICK " + c.Nick + "\r\n")
+	if err != nil {
+		return err
+	}
+
+	// Send USERname
+	_, err = c.Conn.Conn.Write([]byte("USER " + c.User + " 0 * :" + c.RealName + "\r\n"))
+	fmt.Println("USER " + c.User + " 0 * :" + c.RealName + "\r\n")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // SendCommand sends a message/command to the irc server
