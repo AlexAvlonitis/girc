@@ -1,14 +1,15 @@
 package connection
 
 import (
+	"girc/interfaces"
 	"strings"
 )
 
 type Presenter struct {
-	Client *Client
+	Client interfaces.Client
 }
 
-func NewPresenter(c *Client) *Presenter {
+func NewPresenter(c interfaces.Client) *Presenter {
 	return &Presenter{Client: c}
 }
 
@@ -22,7 +23,7 @@ func (p *Presenter) FormatMessage(msg []byte) *Message {
 	s := string(msg)
 
 	// check if the message is a private message and directed to the user
-	if strings.Contains(s, "PRIVMSG") && strings.Contains(s, p.Client.Nick) {
+	if strings.Contains(s, "PRIVMSG") && strings.Contains(s, p.Client.Nick()) {
 		return &Message{Content: p.formatPrivateMessage(s), Type: "private"}
 	} else if strings.Contains(s, "PRIVMSG") {
 		return &Message{Content: p.formatMessageToChannel(s), Type: "channel"}

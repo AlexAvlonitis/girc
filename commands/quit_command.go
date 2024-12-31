@@ -1,18 +1,20 @@
 package commands
 
 import (
-	"girc/connection"
+	"girc/interfaces"
 	"strings"
 )
 
 type QuitCommand struct {
 	Input  string
-	Client *connection.Client
+	Client interfaces.Client
 }
 
-func (c *QuitCommand) Execute() {
+func (c *QuitCommand) Execute() error {
 	cmd, _ := c.Print()
 	c.Client.Write(cmd)
+
+	return nil
 }
 
 func (c *QuitCommand) Print() (string, error) {

@@ -2,28 +2,30 @@ package commands
 
 import (
 	"errors"
-	"girc/connection"
+	"girc/interfaces"
 )
 
 type MessageCommand struct {
 	Input  string
-	Client *connection.Client
+	Client interfaces.Client
 }
 
-func (c *MessageCommand) Execute() {
-	cmd, err := c.Print()
+func (m *MessageCommand) Execute() error {
+	cmd, err := m.Print()
 	if err != nil {
-		c.Client.PrintMessage(err.Error())
-		return
+		m.Client.PrintMessage(err.Error())
+		return err
 	}
 
-	c.Client.Write(cmd)
-	c.Client.PrintMessage("<" + c.Client.Nick + "> " + c.Input)
+	m.Client.Write(cmd)
+	m.Client.PrintMessage("<" + m.Client.Nick() + "> " + m.Input)
+
+	return nil
 }
 
-func (c *MessageCommand) Print() (string, error) {
-	if c.Client.Channel != "" {
-		cmd := "PRIVMSG " + c.Client.Channel + " :" + c.Input + "\r\n"
+func (m *MessageCommand) Print() (string, error) {
+	if m.Client.Channel() != "" {
+		cmd := "PRIVMSG " + m.Client.Channel() + " :" + m.Input + "\r\n"
 		return cmd, nil
 	} else {
 		return "", errors.New("you need to join a channel first")

@@ -1,19 +1,19 @@
 package commands
 
-import (
-	"girc/connection"
-)
+import "girc/interfaces"
 
 type HelpCommand struct {
-	Client *connection.Client
+	Client interfaces.Client
 }
 
-func (c *HelpCommand) Execute() {
-	cmd, _ := c.Print()
-	c.Client.PrintMessage(cmd)
+func (h *HelpCommand) Execute() error {
+	cmd, _ := h.Print()
+	h.Client.PrintMessage(cmd)
+
+	return nil
 }
 
-func (c *HelpCommand) Print() (string, error) {
+func (h *HelpCommand) Print() (string, error) {
 	msg := "Commands:\n"
 	msg += "/join #channel - join a channel\n"
 	msg += "/part #channel - leave a channel\n"

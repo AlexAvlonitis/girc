@@ -1,21 +1,17 @@
 package commands
 
 import (
-	"girc/connection"
+	"girc/interfaces"
 	"strings"
 )
 
 type Command interface {
 	Print() (string, error)
-	Execute()
-}
-
-func CommandExecute(cmd Command) {
-	cmd.Execute()
+	Execute() error
 }
 
 // SendCommand parses a command and sends the appropriate IRC command
-func SendCommand(input string, client *connection.Client) {
+func SendCommand(input string, client interfaces.Client) {
 	var cmd Command
 
 	// Define a map of command strings to their corresponding command structs
@@ -42,5 +38,5 @@ func SendCommand(input string, client *connection.Client) {
 		cmd = &MessageCommand{Input: input, Client: client}
 	}
 
-	CommandExecute(cmd)
+	cmd.Execute()
 }

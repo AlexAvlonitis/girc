@@ -2,28 +2,30 @@ package commands
 
 import (
 	"errors"
-	"girc/connection"
+	"girc/interfaces"
 	"strings"
 )
 
 type PersonalMessageCommand struct {
 	Input  string
-	Client *connection.Client
+	Client interfaces.Client
 }
 
-func (c *PersonalMessageCommand) Execute() {
+func (c *PersonalMessageCommand) Execute() error {
 	cmd, err := c.Print()
 	if err != nil {
 		c.Client.PrintMessage(err.Error())
-		return
+		return err
 	}
 
 	c.Client.Write(cmd)
-	c.Client.PrintMessage("<" + c.Client.Nick + ">(Private) " + c.Input)
+	c.Client.PrintMessage("<" + c.Client.Nick() + ">(Private) " + c.Input)
+
+	return nil
 }
 
 func (c *PersonalMessageCommand) Print() (string, error) {
-	if c.Client.Channel != "" {
+	if c.Client.Channel() != "" {
 		parts := strings.Split(c.Input, " ")
 		if len(parts) > 2 {
 			cmd := "PRIVMSG " + parts[1] + " :" + strings.Join(parts[2:], " ") + "\r\n"

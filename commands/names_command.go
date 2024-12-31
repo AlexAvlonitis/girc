@@ -2,27 +2,29 @@ package commands
 
 import (
 	"errors"
-	"girc/connection"
+	"girc/interfaces"
 	"strings"
 )
 
 type NamesCommand struct {
 	Input  string
-	Client *connection.Client
+	Client interfaces.Client
 }
 
-func (c *NamesCommand) Execute() {
-	cmd, err := c.Print()
+func (n *NamesCommand) Execute() error {
+	cmd, err := n.Print()
 	if err != nil {
-		c.Client.PrintMessage(err.Error())
-		return
+		n.Client.PrintMessage(err.Error())
+		return err
 	}
 
-	c.Client.Write(cmd)
+	n.Client.Write(cmd)
+
+	return nil
 }
 
-func (c *NamesCommand) Print() (string, error) {
-	parts := strings.Split(c.Input, " ")
+func (n *NamesCommand) Print() (string, error) {
+	parts := strings.Split(n.Input, " ")
 
 	if len(parts) > 1 {
 		cmd := "NAMES " + parts[1] + "\r\n"

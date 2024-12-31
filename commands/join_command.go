@@ -2,28 +2,30 @@ package commands
 
 import (
 	"errors"
-	"girc/connection"
+	"girc/interfaces"
 	"strings"
 )
 
 type JoinCommand struct {
 	Input  string
-	Client *connection.Client
+	Client interfaces.Client
 }
 
-func (c *JoinCommand) Execute() {
-	cmd, err := c.Print()
+func (j *JoinCommand) Execute() error {
+	cmd, err := j.Print()
 	if err != nil {
-		c.Client.PrintMessage(err.Error())
-		return
+		j.Client.PrintMessage(err.Error())
+		return err
 	}
 
-	c.Client.Write(cmd)
-	c.Client.Channel = strings.Split(c.Input, " ")[1]
+	j.Client.Write(cmd)
+	j.Client.SetChannel(strings.Split(j.Input, " ")[1])
+
+	return nil
 }
 
-func (c *JoinCommand) Print() (string, error) {
-	parts := strings.Split(c.Input, " ")
+func (j *JoinCommand) Print() (string, error) {
+	parts := strings.Split(j.Input, " ")
 
 	if len(parts) > 1 {
 		channel := parts[1]
