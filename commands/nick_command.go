@@ -19,7 +19,6 @@ func (n *NickCommand) Execute() error {
 	}
 
 	n.Client.Write(cmd)
-	n.Client.SetNick(strings.Split(n.Input, " ")[1])
 	return nil
 }
 
@@ -27,10 +26,12 @@ func (n *NickCommand) Print() (string, error) {
 	parts := strings.Split(n.Input, " ")
 
 	if len(parts) > 1 {
-		cmd := "NICK :" + parts[1] + "\r\n"
+		cmd := "NICK :" + parts[1]
+		n.Client.SetNick(parts[1])
 		return cmd, nil
 	} else if n.Client.Nick() != "" {
-		return "NICK :" + n.Client.Nick() + "\r\n", nil
+		n.Client.SetNick(n.Client.Nick())
+		return "NICK :" + n.Client.Nick(), nil
 	} else {
 		return "", errors.New("invalid command, use /nick newnick")
 	}

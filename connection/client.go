@@ -1,7 +1,7 @@
 package connection
 
 import (
-	"fmt"
+	"girc/commands"
 	"girc/interfaces"
 	"log"
 )
@@ -100,14 +100,15 @@ func (c *DefaultClient) SendPong(msg string) {
 // Register sends the NICK and USER commands to the server, to register the client
 func (c *DefaultClient) Register(channel string) error {
 	// Send NICKname
-	_, err := c.Conn().Conn().Write([]byte("NICK " + c.Nick() + "\r\n"))
+	nickCmd := commands.NickCommand{Client: c}
+	err := nickCmd.Execute()
 	if err != nil {
 		return err
 	}
 
 	// Send USERname
-	_, err = c.Conn().Conn().Write([]byte("USER " + c.User() + " 0 * :" + c.RealName() + "\r\n"))
-	fmt.Println("USER " + c.User() + " 0 * :" + c.RealName() + "\r\n")
+	userCmd := commands.UserCommand{Client: c}
+	err = userCmd.Execute()
 	if err != nil {
 		return err
 	}
