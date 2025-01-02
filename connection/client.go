@@ -1,6 +1,7 @@
 package connection
 
 import (
+	"fmt"
 	"girc/commands"
 	"girc/interfaces"
 	"log"
@@ -94,7 +95,11 @@ func (c *DefaultClient) Read() {
 
 // SendPong sends a PONG message to the server, to keep the connection alive
 func (c *DefaultClient) SendPong(msg string) {
-	c.Write("PONG " + msg)
+	pongCmd := commands.PongCommand{Input: msg, Client: c}
+	err := pongCmd.Execute()
+	if err != nil {
+		fmt.Printf("Error sending PONG: %s", err)
+	}
 }
 
 // Register sends the NICK and USER commands to the server, to register the client
