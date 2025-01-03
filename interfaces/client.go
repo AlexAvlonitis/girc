@@ -15,7 +15,7 @@ type Client interface {
 	User() string
 	RealName() string
 	Ssl() bool
-	Conn() Connection
+	Connection() Connection
 	Channel() string
 	SetChannel(string)
 	SetNick(string)

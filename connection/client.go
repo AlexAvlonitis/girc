@@ -4,37 +4,38 @@ import (
 	"fmt"
 	"girc/commands"
 	"girc/interfaces"
+	"io"
 	"log"
 )
 
 // DefaultClient is the main struct for the IRC client
 type DefaultClient struct {
-	server   string                // Server is the server to connect to
-	port     int                   // Port is the port to connect to
-	nick     string                // Nick is the nickname to use
-	user     string                // User is the username to use
-	realName string                // RealName is the real name to use
-	ssl      bool                  // Ssl is true if the connection is over SSL
-	channel  string                // joined channel
-	doneCh   chan interface{}      // done channel
-	readCh   chan []byte           // read channel
-	conn     interfaces.Connection // Conn is the connection to the server
+	server     string                // Server is the server to connect to
+	port       int                   // Port is the port to connect to
+	nick       string                // Nick is the nickname to use
+	user       string                // User is the username to use
+	realName   string                // RealName is the real name to use
+	ssl        bool                  // Ssl is true if the connection is over SSL
+	channel    string                // joined channel
+	doneCh     chan interface{}      // done channel
+	readCh     chan []byte           // read channel
+	connection interfaces.Connection // Connection is the connection to the server
 }
 
 // Implement the methods to satisfy the Client interface
-func (c *DefaultClient) Server() string              { return c.server }
-func (c *DefaultClient) Port() int                   { return c.port }
-func (c *DefaultClient) Nick() string                { return c.nick }
-func (c *DefaultClient) User() string                { return c.user }
-func (c *DefaultClient) RealName() string            { return c.realName }
-func (c *DefaultClient) Ssl() bool                   { return c.ssl }
-func (c *DefaultClient) Channel() string             { return c.channel }
-func (c *DefaultClient) Conn() interfaces.Connection { return c.conn }
+func (c *DefaultClient) Server() string                    { return c.server }
+func (c *DefaultClient) Port() int                         { return c.port }
+func (c *DefaultClient) Nick() string                      { return c.nick }
+func (c *DefaultClient) User() string                      { return c.user }
+func (c *DefaultClient) RealName() string                  { return c.realName }
+func (c *DefaultClient) Ssl() bool                         { return c.ssl }
+func (c *DefaultClient) Channel() string                   { return c.channel }
+func (c *DefaultClient) Connection() interfaces.Connection { return c.connection }
 
 // Setters
 func (c *DefaultClient) SetChannel(channel string)          { c.channel = channel }
 func (c *DefaultClient) SetNick(nick string)                { c.nick = nick }
-func (c *DefaultClient) SetConn(conn interfaces.Connection) { c.conn = conn }
+func (c *DefaultClient) SetConn(conn interfaces.Connection) { c.connection = conn }
 
 // NewClient creates a new IRC client
 func NewClient(ch chan []byte, done chan interface{}) *DefaultClient {
@@ -60,6 +61,7 @@ func NewClient(ch chan []byte, done chan interface{}) *DefaultClient {
 // and starts reading from the connection
 func (c *DefaultClient) Connect() error {
 	conn := NewConnection(c)
+	fmt.Println("1 Connection ID: ", conn)
 	c.SetConn(conn)
 
 	err := c.Register(c.Channel())
@@ -78,9 +80,17 @@ func (c *DefaultClient) Read() {
 
 	go func() {
 		for {
-			n, err := c.Conn().Conn().Read(buf)
+			n, err := c.Connection().Conn().Read(buf)
 			if err != nil {
+				if err == io.EOF {
+					c.PrintMessage("Connection closed by server")
+					close(c.doneCh)
+					return
+				}
+
 				log.Fatalf("Error reading from connection: %s", err)
+				close(c.doneCh)
+				return
 			}
 
 			select {
@@ -123,7 +133,8 @@ func (c *DefaultClient) Register(channel string) error {
 
 // Write sends a message/command to the IRC server
 func (c *DefaultClient) Write(msg string) {
-	_, err := c.Conn().Conn().Write([]byte(msg))
+	fmt.Println(msg)
+	_, err := c.Connection().Conn().Write([]byte(msg))
 	if err != nil {
 		log.Printf("Error writing to connection: %s", err)
 	}
@@ -136,5 +147,5 @@ func (c *DefaultClient) PrintMessage(msg string) {
 
 // Close closes the connection to the server
 func (c *DefaultClient) Close() {
-	c.Conn().Conn().Close()
+	c.Connection().Conn().Close()
 }

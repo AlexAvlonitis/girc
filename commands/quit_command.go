@@ -22,9 +22,9 @@ func (c *QuitCommand) Print() (string, error) {
 
 	var cmd string
 	if len(parts) > 1 {
-		cmd = "QUIT :" + parts[1] + "\r\n"
+		cmd = "QUIT " + parts[1] + "\r\n"
 	} else {
-		cmd = "QUIT :Bye bye\r\n"
+		cmd = "QUIT Bye bye\r\n"
 	}
 
 	return cmd, nil

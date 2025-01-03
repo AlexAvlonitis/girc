@@ -29,7 +29,7 @@ func (j *JoinCommand) Print() (string, error) {
 
 	if len(parts) > 1 {
 		channel := parts[1]
-		return "JOIN :" + channel + "\r\n", nil
+		return "JOIN " + channel + "\r\n", nil
 	} else {
 		return "", errors.New("invalid command, use /join #channel")
 	}
