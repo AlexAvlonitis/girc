@@ -88,7 +88,7 @@ func (p *MessageParser) formatPrivateMsg(msg *Message) string {
 
 func (p *MessageParser) formatJoin(msg *Message) string {
 	p.Ui.UsersView.Clear()
-	return msg.Source + " has joined the channel " + msg.Args[0]
+	return "[green]" + msg.Source + "[-] has joined the channel " + msg.Args[0]
 }
 
 func (p *MessageParser) formatPart(msg *Message) string {

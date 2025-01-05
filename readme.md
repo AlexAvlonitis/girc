@@ -2,7 +2,8 @@
 
 A simple irc client in go
 
-https://github.com/user-attachments/assets/446ea04a-dfc7-4862-b499-2e06a4b2220e
+![girc](https://github.com/user-attachments/assets/2b670049-1422-4dd8-ac9e-8eb2795af755)
+
 
 ## How to run
 ```
@@ -12,9 +13,9 @@ go install
 go run .
 ```
 
-## Info
+## Preview
 
-Validate the default connection at http://www.dal.net:9090/.
+![image](https://github.com/user-attachments/assets/24e43f3e-896b-4c60-b175-5fbe0d7c2f0e)
 
 ## TODO
 - [ ] Connect to multiple channels
