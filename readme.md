@@ -20,5 +20,6 @@ go run .
 ## TODO
 - [ ] Connect to multiple channels
 - [x] Add some cli beautification
-- [ ] Refactor
+- [ ] Manage PMs better
 - [ ] Support all irc client commands
+- [ ] Refactor - Channels/Events between all domains
