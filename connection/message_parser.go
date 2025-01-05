@@ -51,7 +51,7 @@ func (p *MessageParser) Parse(msg string) string {
 		return handler(message)
 	}
 
-	return message.printMessage()
+	return p.formatGenericMsg(message)
 }
 
 // handlePing handles PING messages from the server, and sends a PONG message back
@@ -96,12 +96,8 @@ func (p *MessageParser) formatPart(msg *Message) string {
 	return "[green]" + msg.Source + "[-] has left the channel " + msg.Args[0]
 }
 
-func (l *Message) printMessage() string {
-	if len(l.Args) > 1 {
-		return "[green]<" + l.Source + ">[-]" + strings.Join(l.Args[1:], " ")
-	} else {
-		return "[green]<" + l.Source + ">[-]" + strings.Join(l.Args, " ")
-	}
+func (p *MessageParser) formatGenericMsg(msg *Message) string {
+	return "[green]<" + p.Client.Nick() + ">[-] " + strings.Join(msg.Args, " ")
 }
 
 // parseMsg Breaks a message from an IRC server into its prefix, command, and arguments

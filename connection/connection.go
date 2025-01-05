@@ -2,7 +2,6 @@ package connection
 
 import (
 	"crypto/tls"
-	"fmt"
 	"girc/interfaces"
 	"log"
 	"net"
@@ -36,7 +35,7 @@ func NewConnection(client interfaces.Client) interfaces.Connection {
 }
 
 func createSSLConnection(address string) (net.Conn, error) {
-	fmt.Println("Connecting to server over SSL...")
+	log.Println("Connecting to server over SSL...")
 
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: true, // Skip certificate verification (unsafe for production)
@@ -46,7 +45,7 @@ func createSSLConnection(address string) (net.Conn, error) {
 }
 
 func createTCPConnection(address string) (net.Conn, error) {
-	fmt.Println("Connecting to server...")
+	log.Println("Connecting to server...")
 
 	return net.Dial("tcp4", address)
 }

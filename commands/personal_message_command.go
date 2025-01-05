@@ -19,7 +19,7 @@ func (c *PersonalMessageCommand) Execute() error {
 	}
 
 	c.Client.Write(cmd)
-	c.Client.PrintMessage("<" + c.Client.Nick() + ">(Private) " + c.Input)
+	c.Client.PrintMessage(":" + c.Client.Nick() + " " + cmd)
 
 	return nil
 }

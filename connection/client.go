@@ -2,7 +2,6 @@ package connection
 
 import (
 	"bufio"
-	"fmt"
 	"girc/commands"
 	"girc/interfaces"
 	"log"
@@ -64,7 +63,6 @@ func NewClient(ch chan string, done chan interface{}) *DefaultClient {
 // and starts reading from the connection
 func (c *DefaultClient) Connect() error {
 	conn := NewConnection(c)
-	fmt.Println("1 Connection ID: ", conn)
 	c.SetConn(conn)
 
 	err := c.Register(c.Channel())
@@ -105,7 +103,7 @@ func (c *DefaultClient) SendPong(msg string) {
 	pongCmd := commands.PongCommand{Input: msg, Client: c}
 	err := pongCmd.Execute()
 	if err != nil {
-		fmt.Printf("Error sending PONG: %s", err)
+		log.Printf("Error sending PONG: %s", err)
 	}
 }
 
