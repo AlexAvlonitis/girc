@@ -97,7 +97,11 @@ func (p *MessageParser) formatPart(msg *Message) string {
 }
 
 func (l *Message) printMessage() string {
-	return "[green]<" + l.Source + ">[-]" + strings.Join(l.Args, " ")
+	if len(l.Args) > 1 {
+		return "[green]<" + l.Source + ">[-]" + strings.Join(l.Args[1:], " ")
+	} else {
+		return "[green]<" + l.Source + ">[-]" + strings.Join(l.Args, " ")
+	}
 }
 
 // parseMsg Breaks a message from an IRC server into its prefix, command, and arguments
