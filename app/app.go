@@ -43,7 +43,7 @@ func Init() {
 	})
 
 	// create a message parser, to parse incoming messages from the server
-	msgParser := connection.NewMessageParser(client)
+	msgParser := connection.NewMessageParser(client, ui)
 
 	// Run the main application loop
 	go func() {

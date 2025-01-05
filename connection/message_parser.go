@@ -3,6 +3,7 @@ package connection
 import (
 	"errors"
 	"girc/interfaces"
+	"girc/ui"
 	"strings"
 )
 
@@ -14,10 +15,11 @@ type Message struct {
 
 type MessageParser struct {
 	Client interfaces.Client
+	Ui     *ui.UI
 }
 
-func NewMessageParser(c interfaces.Client) *MessageParser {
-	return &MessageParser{Client: c}
+func NewMessageParser(c interfaces.Client, ui *ui.UI) *MessageParser {
+	return &MessageParser{Client: c, Ui: ui}
 }
 
 // Parse formats the messages received from the server, and categorizes them
@@ -31,14 +33,14 @@ func (p *MessageParser) Parse(msg string) string {
 		return p.formatPrivateMsg(message)
 	} else if p.isNickChange(message) {
 		return p.formatNickChange(message)
-	} else if p.isJoin(message) {
-		return message.printMessage()
+	} else if p.isNames(message) {
+		return p.formatNames(message)
 	} else if p.isPing(message) {
 		p.Client.Write("PONG " + p.formatPing(msg)) // keep the connection alive
 		return ""
 	}
 
-	return msg
+	return message.printMessage()
 }
 
 func (p *MessageParser) NamesToList(msg string) []string {
@@ -51,20 +53,17 @@ func (p *MessageParser) formatPing(msg string) string {
 }
 
 // FormatNames parse the names of the users in a channel
-// func (p *MessageParser) FormatNames(msg string) string {
-// 	names := []string{}
+func (p *MessageParser) formatNames(msg *Message) string {
+	// get names after 4th index
+	names := msg.Args[3]
+	p.Ui.UsersView.Clear()
+	for _, name := range strings.Split(names, " ") {
+		p.Ui.UsersView.AddItem(name, "", 0, nil)
+	}
+	p.Ui.App.Draw()
 
-// 	parts := strings.Split(msg, "\n")
-// 	for _, part := range parts {
-// 		if p.isNames(part) {
-// 			words := strings.Split(part, " ")
-// 			names = words[5:]
-// 			break
-// 		}
-// 	}
-
-// 	return strings.Join(names, " ")
-// }
+	return ""
+}
 
 func (p *MessageParser) isNames(msg *Message) bool {
 	return msg.Command == "353"
@@ -76,10 +75,6 @@ func (p *MessageParser) isPrivateMessage(msg *Message) bool {
 
 func (p *MessageParser) isNickChange(msg *Message) bool {
 	return msg.Command == "NICK"
-}
-
-func (p *MessageParser) isJoin(msg *Message) bool {
-	return msg.Command == "JOIN"
 }
 
 func (p *MessageParser) isPing(msg *Message) bool {
