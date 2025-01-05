@@ -33,6 +33,10 @@ func (p *MessageParser) Parse(msg string) string {
 		return p.formatPrivateMsg(message)
 	} else if p.isNickChange(message) {
 		return p.formatNickChange(message)
+	} else if p.isJoin(message) {
+		return p.formatJoin(message)
+	} else if p.isPart(message) {
+		return p.formatPart(message)
 	} else if p.isNames(message) {
 		return p.formatNames(message)
 	} else if p.isPing(message) {
@@ -56,8 +60,8 @@ func (p *MessageParser) formatPing(msg string) string {
 func (p *MessageParser) formatNames(msg *Message) string {
 	// get names after 4th index
 	names := msg.Args[3]
-	p.Ui.UsersView.Clear()
 	for _, name := range strings.Split(names, " ") {
+		p.Client.SetUsers(append(p.Client.Users(), name))
 		p.Ui.UsersView.AddItem(name, "", 0, nil)
 	}
 	p.Ui.App.Draw()
@@ -81,6 +85,14 @@ func (p *MessageParser) isPing(msg *Message) bool {
 	return msg.Command == "PING"
 }
 
+func (p *MessageParser) isJoin(msg *Message) bool {
+	return msg.Command == "JOIN"
+}
+
+func (p *MessageParser) isPart(msg *Message) bool {
+	return msg.Command == "PART"
+}
+
 func (p *MessageParser) formatNickChange(msg *Message) string {
 	return msg.Source + " is now known as " + msg.Args[0]
 }
@@ -92,6 +104,16 @@ func (p *MessageParser) formatPrivateMsg(msg *Message) string {
 	} else {
 		return "<" + msg.Source + "> " + msg.Args[1]
 	}
+}
+
+func (p *MessageParser) formatJoin(msg *Message) string {
+	p.Ui.UsersView.Clear()
+	return msg.Source + " has joined the channel " + msg.Args[0]
+}
+
+func (p *MessageParser) formatPart(msg *Message) string {
+	p.Ui.UsersView.Clear()
+	return msg.Source + " has left the channel " + msg.Args[0]
 }
 
 func (l *Message) printMessage() string {

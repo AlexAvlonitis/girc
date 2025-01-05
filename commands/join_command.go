@@ -18,6 +18,7 @@ func (j *JoinCommand) Execute() error {
 		return err
 	}
 
+	j.Client.SetUsers([]string{})
 	j.Client.Write(cmd)
 	j.Client.SetChannel(strings.Split(j.Input, " ")[1])
 

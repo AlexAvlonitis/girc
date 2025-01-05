@@ -17,6 +17,7 @@ func (c *PartCommand) Execute() error {
 		return err
 	}
 
+	c.Client.SetUsers([]string{})
 	c.Client.Write(cmd)
 	c.Client.SetChannel("")
 

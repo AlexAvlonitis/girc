@@ -20,6 +20,7 @@ type DefaultClient struct {
 	doneCh     chan interface{}      // done channel
 	readCh     chan string           // read channel
 	connection interfaces.Connection // Connection is the connection to the server
+	users      []string              // Users is the list of users in the channel
 }
 
 // Implement the methods to satisfy the Client interface
@@ -31,11 +32,13 @@ func (c *DefaultClient) RealName() string                  { return c.realName }
 func (c *DefaultClient) Ssl() bool                         { return c.ssl }
 func (c *DefaultClient) Channel() string                   { return c.channel }
 func (c *DefaultClient) Connection() interfaces.Connection { return c.connection }
+func (c *DefaultClient) Users() []string                   { return c.users }
 
 // Setters
 func (c *DefaultClient) SetChannel(channel string)          { c.channel = channel }
 func (c *DefaultClient) SetNick(nick string)                { c.nick = nick }
 func (c *DefaultClient) SetConn(conn interfaces.Connection) { c.connection = conn }
+func (c *DefaultClient) SetUsers(users []string)            { c.users = users }
 
 // NewClient creates a new IRC client
 func NewClient(ch chan string, done chan interface{}) *DefaultClient {

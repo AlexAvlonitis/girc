@@ -17,7 +17,9 @@ type Client interface {
 	Ssl() bool
 	Connection() Connection
 	Channel() string
+	Users() []string
 	SetChannel(string)
 	SetNick(string)
 	SetConn(Connection)
+	SetUsers([]string)
 }
