@@ -29,6 +29,8 @@ func (n *NamesCommand) Print() (string, error) {
 	if len(parts) > 1 {
 		cmd := "NAMES " + parts[1] + "\r\n"
 		return cmd, nil
+	} else if n.Client.Channel() != "" {
+		return "NAMES " + n.Client.Channel() + "\r\n", nil
 	} else {
 		return "", errors.New("invalid command, use /names #channel")
 	}

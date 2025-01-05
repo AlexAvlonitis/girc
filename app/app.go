@@ -16,7 +16,7 @@ func Init() {
 	defer close(done)
 
 	// Create a channel to read messages from the IRC server
-	ch := make(chan []byte)
+	ch := make(chan string)
 	defer close(ch)
 
 	// Create a client and establish a connection
@@ -42,8 +42,8 @@ func Init() {
 		}
 	})
 
-	// Create a presenter to format incoming messages
-	presenter := connection.NewPresenter(client)
+	// create a message parser, to parse incoming messages from the server
+	msgParser := connection.NewMessageParser(client)
 
 	// Run the main application loop
 	go func() {
@@ -52,23 +52,8 @@ func Init() {
 			case <-done:
 				return
 			case msg := <-ch:
-				message := presenter.FormatMessage(msg)
-
-				switch message.Type {
-				case "ping":
-					client.SendPong(message.Content)
-				// TODO: get the names of a channel
-				case "join":
-					fmt.Fprintf(ui.MessageView, "%s\n", message.Content)
-					// names := presenter.NamesToList(message.Content)
-					// ui.UsersView.Clear()
-					// for _, name := range names {
-					// 	ui.UsersView.AddItem(name, "", 0, nil)
-					// }
-					// ui.App.Draw()
-				default:
-					fmt.Fprintf(ui.MessageView, "%s\n", message.Content)
-				}
+				parsed := msgParser.Parse(msg)
+				fmt.Fprintf(ui.MessageView, "%s\n", parsed)
 			}
 		}
 	}()

@@ -1,10 +1,10 @@
 package connection
 
 import (
+	"bufio"
 	"fmt"
 	"girc/commands"
 	"girc/interfaces"
-	"io"
 	"log"
 )
 
@@ -18,7 +18,7 @@ type DefaultClient struct {
 	ssl        bool                  // Ssl is true if the connection is over SSL
 	channel    string                // joined channel
 	doneCh     chan interface{}      // done channel
-	readCh     chan []byte           // read channel
+	readCh     chan string           // read channel
 	connection interfaces.Connection // Connection is the connection to the server
 }
 
@@ -38,7 +38,7 @@ func (c *DefaultClient) SetNick(nick string)                { c.nick = nick }
 func (c *DefaultClient) SetConn(conn interfaces.Connection) { c.connection = conn }
 
 // NewClient creates a new IRC client
-func NewClient(ch chan []byte, done chan interface{}) *DefaultClient {
+func NewClient(ch chan string, done chan interface{}) *DefaultClient {
 	cfg, err := NewConfiguration()
 	if err != nil {
 		log.Fatalf("Error reading configuration: %s", err)
@@ -76,19 +76,13 @@ func (c *DefaultClient) Connect() error {
 
 // Read reads from the connection
 func (c *DefaultClient) Read() {
-	buf := make([]byte, 4096)
+	reader := bufio.NewReader(c.Connection().Conn())
 
 	go func() {
 		for {
-			n, err := c.Connection().Conn().Read(buf)
+			message, err := reader.ReadString('\n')
 			if err != nil {
-				if err == io.EOF {
-					c.PrintMessage("Connection closed by server")
-					close(c.doneCh)
-					return
-				}
-
-				log.Fatalf("Error reading from connection: %s", err)
+				log.Fatalf("Error reading from server: %s", err)
 				close(c.doneCh)
 				return
 			}
@@ -97,7 +91,7 @@ func (c *DefaultClient) Read() {
 			case <-c.doneCh:
 				return
 			default:
-				c.readCh <- buf[:n]
+				c.readCh <- message
 			}
 		}
 	}()
@@ -133,7 +127,6 @@ func (c *DefaultClient) Register(channel string) error {
 
 // Write sends a message/command to the IRC server
 func (c *DefaultClient) Write(msg string) {
-	fmt.Println(msg)
 	_, err := c.Connection().Conn().Write([]byte(msg))
 	if err != nil {
 		log.Printf("Error writing to connection: %s", err)
@@ -142,7 +135,7 @@ func (c *DefaultClient) Write(msg string) {
 
 // PrintMessage prints the message to the console via the channel
 func (c *DefaultClient) PrintMessage(msg string) {
-	c.readCh <- []byte(msg)
+	c.readCh <- msg
 }
 
 // Close closes the connection to the server

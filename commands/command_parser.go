@@ -5,17 +5,12 @@ import (
 	"strings"
 )
 
-type Command interface {
-	Print() (string, error)
-	Execute() error
-}
-
 // SendCommand parses a command and sends the appropriate IRC command
 func SendCommand(input string, client interfaces.Client) {
-	var cmd Command
+	var cmd interfaces.Command
 
 	// Define a map of command strings to their corresponding command structs
-	commandMap := map[string]Command{
+	commandMap := map[string]interfaces.Command{
 		"/join":  &JoinCommand{Input: input, Client: client},
 		"/part":  &PartCommand{Input: input, Client: client},
 		"/nick":  &NickCommand{Input: input, Client: client},
@@ -38,5 +33,6 @@ func SendCommand(input string, client interfaces.Client) {
 		cmd = &MessageCommand{Input: input, Client: client}
 	}
 
+	// Execute the command
 	cmd.Execute()
 }
