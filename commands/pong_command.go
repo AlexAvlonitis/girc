@@ -10,13 +10,13 @@ type PongCommand struct {
 }
 
 func (p *PongCommand) Execute() error {
-	cmd, _ := p.Print()
+	cmd, _ := p.BuildCommand()
 	p.Client.Write(cmd)
 
 	return nil
 }
 
-func (p *PongCommand) Print() (string, error) {
+func (p *PongCommand) BuildCommand() (string, error) {
 	cmd := "PONG " + p.Input
 	return cmd, nil
 }

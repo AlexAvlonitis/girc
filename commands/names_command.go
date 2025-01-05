@@ -12,26 +12,27 @@ type NamesCommand struct {
 }
 
 func (n *NamesCommand) Execute() error {
-	cmd, err := n.Print()
+	cmd, err := n.BuildCommand()
 	if err != nil {
 		n.Client.PrintMessage(err.Error())
 		return err
 	}
 
 	n.Client.Write(cmd)
-
 	return nil
 }
 
-func (n *NamesCommand) Print() (string, error) {
-	parts := strings.Split(n.Input, " ")
+func (n *NamesCommand) BuildCommand() (string, error) {
+	parts := strings.Fields(n.Input)
 
 	if len(parts) > 1 {
-		cmd := "NAMES " + parts[1] + "\r\n"
-		return cmd, nil
-	} else if n.Client.Channel() != "" {
-		return "NAMES " + n.Client.Channel() + "\r\n", nil
-	} else {
-		return "", errors.New("invalid command, use /names #channel")
+		return "NAMES " + parts[1] + "\r\n", nil
 	}
+
+	channel := n.Client.Channel()
+	if channel != "" {
+		return "NAMES " + channel + "\r\n", nil
+	}
+
+	return "", errors.New("invalid command, use /names #channel")
 }

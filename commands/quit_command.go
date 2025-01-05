@@ -11,13 +11,13 @@ type QuitCommand struct {
 }
 
 func (c *QuitCommand) Execute() error {
-	cmd, _ := c.Print()
+	cmd, _ := c.BuildCommand()
 	c.Client.Write(cmd)
 
 	return nil
 }
 
-func (c *QuitCommand) Print() (string, error) {
+func (c *QuitCommand) BuildCommand() (string, error) {
 	parts := strings.Split(c.Input, " ")
 
 	var cmd string

@@ -9,7 +9,7 @@ type UserCommand struct {
 }
 
 func (u *UserCommand) Execute() error {
-	cmd, err := u.Print()
+	cmd, err := u.BuildCommand()
 	if err != nil {
 		u.Client.PrintMessage(err.Error())
 		return err
@@ -19,7 +19,7 @@ func (u *UserCommand) Execute() error {
 	return nil
 }
 
-func (u *UserCommand) Print() (string, error) {
+func (u *UserCommand) BuildCommand() (string, error) {
 	cmd := "USER " + u.Client.User() + " 0 * :" + u.Client.RealName() + "\r\n"
 	return cmd, nil
 }

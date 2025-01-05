@@ -11,7 +11,7 @@ type MessageCommand struct {
 }
 
 func (m *MessageCommand) Execute() error {
-	cmd, err := m.Print()
+	cmd, err := m.BuildCommand()
 	if err != nil {
 		m.Client.PrintMessage(err.Error())
 		return err
@@ -23,7 +23,7 @@ func (m *MessageCommand) Execute() error {
 	return nil
 }
 
-func (m *MessageCommand) Print() (string, error) {
+func (m *MessageCommand) BuildCommand() (string, error) {
 	if m.Client.Channel() != "" {
 		cmd := "PRIVMSG " + m.Client.Channel() + " :" + m.Input + "\r\n"
 		return cmd, nil

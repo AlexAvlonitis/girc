@@ -12,7 +12,7 @@ type PersonalMessageCommand struct {
 }
 
 func (c *PersonalMessageCommand) Execute() error {
-	cmd, err := c.Print()
+	cmd, err := c.BuildCommand()
 	if err != nil {
 		c.Client.PrintMessage(err.Error())
 		return err
@@ -24,7 +24,7 @@ func (c *PersonalMessageCommand) Execute() error {
 	return nil
 }
 
-func (c *PersonalMessageCommand) Print() (string, error) {
+func (c *PersonalMessageCommand) BuildCommand() (string, error) {
 	if c.Client.Channel() != "" {
 		parts := strings.Split(c.Input, " ")
 		if len(parts) > 2 {

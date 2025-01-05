@@ -12,7 +12,7 @@ type JoinCommand struct {
 }
 
 func (j *JoinCommand) Execute() error {
-	cmd, err := j.Print()
+	cmd, err := j.BuildCommand()
 	if err != nil {
 		j.Client.PrintMessage(err.Error())
 		return err
@@ -24,7 +24,7 @@ func (j *JoinCommand) Execute() error {
 	return nil
 }
 
-func (j *JoinCommand) Print() (string, error) {
+func (j *JoinCommand) BuildCommand() (string, error) {
 	parts := strings.Split(j.Input, " ")
 
 	if len(parts) > 1 {

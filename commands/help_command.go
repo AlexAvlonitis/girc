@@ -7,13 +7,13 @@ type HelpCommand struct {
 }
 
 func (h *HelpCommand) Execute() error {
-	cmd, _ := h.Print()
+	cmd, _ := h.BuildCommand()
 	h.Client.PrintMessage(cmd)
 
 	return nil
 }
 
-func (h *HelpCommand) Print() (string, error) {
+func (h *HelpCommand) BuildCommand() (string, error) {
 	msg := "Commands:\n"
 	msg += "/join #channel - join a channel\n"
 	msg += "/part #channel - leave a channel\n"

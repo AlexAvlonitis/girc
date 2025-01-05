@@ -11,7 +11,7 @@ type PartCommand struct {
 }
 
 func (c *PartCommand) Execute() error {
-	cmd, err := c.Print()
+	cmd, err := c.BuildCommand()
 	if err != nil {
 		c.Client.PrintMessage(err.Error())
 		return err
@@ -23,7 +23,7 @@ func (c *PartCommand) Execute() error {
 	return nil
 }
 
-func (c *PartCommand) Print() (string, error) {
+func (c *PartCommand) BuildCommand() (string, error) {
 	if c.Client.Channel() == "" {
 		return "", errors.New("you have not joined that channel")
 	}

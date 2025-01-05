@@ -12,7 +12,7 @@ type NickCommand struct {
 }
 
 func (n *NickCommand) Execute() error {
-	cmd, err := n.Print()
+	cmd, err := n.BuildCommand()
 	if err != nil {
 		n.Client.PrintMessage(err.Error())
 		return err
@@ -22,16 +22,19 @@ func (n *NickCommand) Execute() error {
 	return nil
 }
 
-func (n *NickCommand) Print() (string, error) {
-	parts := strings.Split(n.Input, " ")
+func (n *NickCommand) BuildCommand() (string, error) {
+	parts := strings.Fields(n.Input)
 
 	if len(parts) > 1 {
-		cmd := "NICK " + parts[1] + "\r\n"
-		n.Client.SetNick(parts[1])
-		return cmd, nil
-	} else if n.Client.Nick() != "" {
-		return "NICK " + n.Client.Nick() + "\r\n", nil
-	} else {
-		return "", errors.New("invalid command, use /nick newnick")
+		newNick := parts[1]
+		n.Client.SetNick(newNick)
+		return "NICK " + newNick + "\r\n", nil
 	}
+
+	currentNick := n.Client.Nick()
+	if currentNick != "" {
+		return "NICK " + currentNick + "\r\n", nil
+	}
+
+	return "", errors.New("invalid command, use /nick newnick")
 }

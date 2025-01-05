@@ -1,6 +1,6 @@
 package interfaces
 
 type Command interface {
-	Print() (string, error)
+	BuildCommand() (string, error)
 	Execute() error
 }
