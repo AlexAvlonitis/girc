@@ -66,7 +66,7 @@ func (p *MessageParser) formatNames(msg *Message) string {
 	names := msg.Args[3]
 	for _, name := range strings.Split(names, " ") {
 		p.Client.SetUsers(append(p.Client.Users(), name))
-		p.Ui.UsersView.AddItem("[green]"+name+"[-]", "", 0, nil)
+		p.Ui.UsersView.AddItem(name, "", 0, nil)
 	}
 	p.Ui.App.Draw()
 
