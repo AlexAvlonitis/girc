@@ -2,7 +2,7 @@
 
 A simple irc client in go
 
-![girc](https://github.com/user-attachments/assets/2b670049-1422-4dd8-ac9e-8eb2795af755)
+![girc](https://github.com/user-attachments/assets/4983fc29-ea5f-4a94-abc7-0da2bd7aae7d)
 
 
 ## How to run
