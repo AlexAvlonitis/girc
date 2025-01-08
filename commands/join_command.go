@@ -18,9 +18,7 @@ func (j *JoinCommand) Execute() error {
 		return err
 	}
 
-	j.Client.SetUsers([]string{})
 	j.Client.Write(cmd)
-	j.Client.SetChannel(strings.Split(j.Input, " ")[1])
 
 	return nil
 }
@@ -29,8 +27,8 @@ func (j *JoinCommand) BuildCommand() (string, error) {
 	parts := strings.Split(j.Input, " ")
 
 	if len(parts) > 1 {
-		channel := parts[1]
-		return "JOIN " + channel + "\r\n", nil
+		args := strings.Join(parts[1:], " ")
+		return "JOIN " + args + "\r\n", nil
 	} else {
 		return "", errors.New("invalid command, use /join #channel")
 	}

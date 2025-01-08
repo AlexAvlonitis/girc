@@ -109,15 +109,17 @@ func (c *DefaultClient) SendPong(msg string) {
 
 // Register sends the NICK and USER commands to the server, to register the client
 func (c *DefaultClient) Register(channel string) error {
-	// Send NICKname
-	nickCmd := commands.NickCommand{Client: c}
+	// Send default NICKname
+	nick := "/nick " + c.Nick()
+	nickCmd := commands.NickCommand{Input: nick, Client: c}
 	err := nickCmd.Execute()
 	if err != nil {
 		return err
 	}
 
-	// Send USERname
-	userCmd := commands.UserCommand{Client: c}
+	// Send default USERname
+	user := "/user " + c.User() + " 0 * :" + c.RealName()
+	userCmd := commands.UserCommand{Input: user, Client: c}
 	err = userCmd.Execute()
 	if err != nil {
 		return err

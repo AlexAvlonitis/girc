@@ -18,16 +18,16 @@ func (m *MessageCommand) Execute() error {
 	}
 
 	m.Client.Write(cmd)
-	m.Client.PrintMessage("<" + m.Client.Nick() + "> " + m.Input)
+	// m.Client.PrintMessage("<" + m.Client.Nick() + "> " + m.Input)
 
 	return nil
 }
 
 func (m *MessageCommand) BuildCommand() (string, error) {
-	if m.Client.Channel() != "" {
-		cmd := "PRIVMSG " + m.Client.Channel() + " :" + m.Input + "\r\n"
-		return cmd, nil
-	} else {
+	if m.Client.Channel() == "" {
 		return "", errors.New("you need to join a channel first")
 	}
+
+	cmd := "PRIVMSG " + m.Client.Channel() + " :" + m.Input + "\r\n"
+	return cmd, nil
 }

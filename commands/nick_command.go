@@ -19,6 +19,7 @@ func (n *NickCommand) Execute() error {
 	}
 
 	n.Client.Write(cmd)
+
 	return nil
 }
 
@@ -26,14 +27,8 @@ func (n *NickCommand) BuildCommand() (string, error) {
 	parts := strings.Fields(n.Input)
 
 	if len(parts) > 1 {
-		newNick := parts[1]
-		n.Client.SetNick(newNick)
-		return "NICK " + newNick + "\r\n", nil
-	}
-
-	currentNick := n.Client.Nick()
-	if currentNick != "" {
-		return "NICK " + currentNick + "\r\n", nil
+		args := strings.Join(parts[1:], " ")
+		return "NICK " + args + "\r\n", nil
 	}
 
 	return "", errors.New("invalid command, use /nick newnick")

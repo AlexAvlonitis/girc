@@ -19,6 +19,7 @@ func (n *NamesCommand) Execute() error {
 	}
 
 	n.Client.Write(cmd)
+
 	return nil
 }
 
@@ -26,12 +27,8 @@ func (n *NamesCommand) BuildCommand() (string, error) {
 	parts := strings.Fields(n.Input)
 
 	if len(parts) > 1 {
-		return "NAMES " + parts[1] + "\r\n", nil
-	}
-
-	channel := n.Client.Channel()
-	if channel != "" {
-		return "NAMES " + channel + "\r\n", nil
+		args := strings.Join(parts[1:], " ")
+		return "NAMES " + args + "\r\n", nil
 	}
 
 	return "", errors.New("invalid command, use /names #channel")

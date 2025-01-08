@@ -20,12 +20,10 @@ func (c *QuitCommand) Execute() error {
 func (c *QuitCommand) BuildCommand() (string, error) {
 	parts := strings.Split(c.Input, " ")
 
-	var cmd string
 	if len(parts) > 1 {
-		cmd = "QUIT " + parts[1] + "\r\n"
-	} else {
-		cmd = "QUIT Bye bye\r\n"
+		args := strings.Join(parts[1:], " ")
+		return "QUIT " + args + "\r\n", nil
 	}
 
-	return cmd, nil
+	return "QUIT Bye bye\r\n", nil
 }

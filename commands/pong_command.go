@@ -18,5 +18,6 @@ func (p *PongCommand) Execute() error {
 
 func (p *PongCommand) BuildCommand() (string, error) {
 	cmd := "PONG " + p.Input
+
 	return cmd, nil
 }

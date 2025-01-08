@@ -16,6 +16,7 @@ func SendCommand(input string, client interfaces.Client) {
 		"/nick":  &NickCommand{Input: input, Client: client},
 		"/msg":   &PersonalMessageCommand{Input: input, Client: client},
 		"/names": &NamesCommand{Input: input, Client: client},
+		"/user":  &UserCommand{Input: input, Client: client},
 		"/quit":  &QuitCommand{Input: input, Client: client},
 		"/help":  &HelpCommand{Client: client},
 	}

@@ -3,6 +3,7 @@ package commands
 import (
 	"errors"
 	"girc/interfaces"
+	"strings"
 )
 
 type PartCommand struct {
@@ -17,17 +18,18 @@ func (c *PartCommand) Execute() error {
 		return err
 	}
 
-	c.Client.SetUsers([]string{})
 	c.Client.Write(cmd)
-	c.Client.SetChannel("")
 
 	return nil
 }
 
 func (c *PartCommand) BuildCommand() (string, error) {
-	if c.Client.Channel() == "" {
-		return "", errors.New("you have not joined that channel")
+	parts := strings.Fields(c.Input)
+
+	if len(parts) > 1 {
+		args := strings.Join(parts[1:], " ")
+		return "PART " + args + "\r\n", nil
 	}
 
-	return "PART " + c.Client.Channel() + "\r\n", nil
+	return "", errors.New("invalid command, use /part #channel")
 }
