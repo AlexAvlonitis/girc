@@ -1,7 +1,7 @@
 ---
 server: "halcyon.il.us.dal.net"
 port: 6667
-nick: "gircClient"
+nick: "girc"
 user: "girc"
 realName: "girc Client"
 ssl: false

@@ -14,7 +14,6 @@ type JoinCommand struct {
 func (j *JoinCommand) Execute() error {
 	cmd, err := j.BuildCommand()
 	if err != nil {
-		j.Client.PrintMessage(err.Error())
 		return err
 	}
 

@@ -1,7 +1,6 @@
 package connection
 
 import (
-	"errors"
 	"girc/interfaces"
 	"girc/ui"
 	"strings"
@@ -33,17 +32,14 @@ func NewMessageParser(c interfaces.Client, ui *ui.UI) *MessageParser {
 
 // Parse formats the messages received from the server, and categorizes them
 func (p *MessageParser) Parse(msg string) string {
-	message, err := parseMsg(msg)
-	if err != nil {
-		return ""
-	}
+	message := parseMsg(msg)
 
 	handlers := map[string]func(*Message) string{
 		privMsg:  p.privMsgCallback,
 		nickMsg:  p.nickCallback,
+		joinMsg:  p.joinCallback,
 		namesMsg: p.namesCallback,
 		pingMsg:  p.pingCallback,
-		joinMsg:  p.joinCallback,
 		partMsg:  p.partCallback,
 	}
 
@@ -87,15 +83,17 @@ func (p *MessageParser) privMsgCallback(msg *Message) string {
 		return "[green]<" + msg.Source + ">[-][yellow](Private)[-] " + msg.Args[1]
 	}
 
-	return "[green]<" + msg.Source + ">[-] " + msg.Args[1]
+	return "[green]<" + msg.Source + ">[-] " + strings.Join(msg.Args[1:], " ")
 }
 
 func (p *MessageParser) joinCallback(msg *Message) string {
+	channel := strings.TrimPrefix(msg.Args[0], ":")
+
 	p.Ui.UsersView.Clear()
-	p.Client.SetChannel(msg.Args[0])
+	p.Client.SetChannel(channel)
 	p.Client.SetUsers([]string{})
 
-	return "[green]" + msg.Source + "[-] has joined the channel " + msg.Args[0]
+	return "[green]<" + msg.Source + ">[-] has joined the channel " + channel
 }
 
 func (p *MessageParser) partCallback(msg *Message) string {
@@ -103,58 +101,60 @@ func (p *MessageParser) partCallback(msg *Message) string {
 	p.Client.SetUsers([]string{})
 	p.Client.SetChannel("")
 
-	return "[green]" + msg.Source + "[-] has left the channel " + msg.Args[0]
+	return "[green]<" + msg.Source + ">[-] has left the channel " + msg.Args[0]
 }
 
 func (p *MessageParser) genericMsgCallback(msg *Message) string {
+	if len(msg.Args) > 0 {
+		return "[green]<" + msg.Source + ">[-] " + strings.Join(msg.Args[1:], " ")
+	}
+
 	return "[green]<" + p.Client.Nick() + ">[-] " + strings.Join(msg.Args, " ")
 }
 
 // parseMsg Breaks a message from an IRC server into its prefix, command, and arguments
 // parsemsg(":test!~test@test.com PRIVMSG #channel :Hi!")
 // Message('test!~test@test.com', 'PRIVMSG', ['#channel', 'Hi!'])
-// https://stackoverflow.com/questions/930700/python-parsing-irc-messages
-func parseMsg(s string) (*Message, error) {
-	var prefix string
-	var trailing string
-	var args []string
+func parseMsg(s string) *Message {
+	// Trim any extraneous spaces or newlines
+	s = strings.TrimSpace(s)
 
-	// Check if the input string is empty
-	if s == "" {
-		return nil, errors.New("empty string")
-	}
+	// Initialize the result
+	message := &Message{}
 
-	// If the message starts with a ':', it has a prefix
-	if s[0] == ':' {
-		// Split the string into prefix and the rest of the message
+	// Check for a prefix (starts with ":")
+	if strings.HasPrefix(s, ":") {
+		// Split off the prefix
 		split := strings.SplitN(s[1:], " ", 2)
-		prefix = split[0]
-		s = split[1]
+		message.Source = split[0]
+		if len(split) > 1 {
+			s = split[1]
+		} else {
+			s = ""
+		}
 	}
 
-	// Check if the message contains a trailing part after ' :'
-	if strings.Contains(s, " :") {
-		// Split the string into the main part and the trailing part
-		split := strings.SplitN(s, " :", 2)
-		s = split[0]
-		trailing = split[1]
-		// Split the main part into arguments and append the trailing part as the last argument
-		args = strings.Split(s, " ")
-		args = append(args, trailing)
+	// Extract the command
+	parts := strings.SplitN(s, " ", 2)
+	message.Command = parts[0]
+	if len(parts) > 1 {
+		s = parts[1]
 	} else {
-		// If there is no trailing part, split the entire string into arguments
-		args = strings.Split(s, " ")
+		s = ""
 	}
 
-	// The first argument is the command
-	command := args[0]
-	// The rest are the arguments
-	args = args[1:]
+	// Handle parameters and trailing arguments
+	if strings.Contains(s, " :") {
+		// Split middle parameters and trailing
+		middleAndTrailing := strings.SplitN(s, " :", 2)
+		if len(middleAndTrailing[0]) > 0 {
+			message.Args = append(message.Args, strings.Fields(middleAndTrailing[0])...)
+		}
+		message.Args = append(message.Args, middleAndTrailing[1])
+	} else if len(s) > 0 {
+		// Only middle parameters (no trailing)
+		message.Args = strings.Fields(s)
+	}
 
-	// Return the parsed message
-	return &Message{
-		Source:  prefix,
-		Command: command,
-		Args:    args,
-	}, nil
+	return message
 }

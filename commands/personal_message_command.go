@@ -14,11 +14,11 @@ type PersonalMessageCommand struct {
 func (c *PersonalMessageCommand) Execute() error {
 	cmd, err := c.BuildCommand()
 	if err != nil {
-		c.Client.PrintMessage(err.Error())
 		return err
 	}
 
 	c.Client.Write(cmd)
+	// irc does not echo personal messages
 	c.Client.PrintMessage(":" + c.Client.Nick() + " " + cmd)
 
 	return nil

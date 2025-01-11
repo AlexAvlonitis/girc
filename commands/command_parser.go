@@ -9,7 +9,6 @@ import (
 func SendCommand(input string, client interfaces.Client) {
 	var cmd interfaces.Command
 
-	// Define a map of command strings to their corresponding command structs
 	commandMap := map[string]interfaces.Command{
 		"/join":  &JoinCommand{Input: input, Client: client},
 		"/part":  &PartCommand{Input: input, Client: client},
@@ -34,6 +33,9 @@ func SendCommand(input string, client interfaces.Client) {
 		cmd = &MessageCommand{Input: input, Client: client}
 	}
 
-	// Execute the command
-	cmd.Execute()
+	err := cmd.Execute()
+	if err != nil {
+		// Custom error that can be parsed by msg parser
+		client.PrintMessage(":error 999 e :" + err.Error())
+	}
 }

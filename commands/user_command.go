@@ -14,7 +14,6 @@ type UserCommand struct {
 func (u *UserCommand) Execute() error {
 	cmd, err := u.BuildCommand()
 	if err != nil {
-		u.Client.PrintMessage(err.Error())
 		return err
 	}
 

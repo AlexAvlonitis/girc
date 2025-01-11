@@ -14,7 +14,6 @@ type NickCommand struct {
 func (n *NickCommand) Execute() error {
 	cmd, err := n.BuildCommand()
 	if err != nil {
-		n.Client.PrintMessage(err.Error())
 		return err
 	}
 

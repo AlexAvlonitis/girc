@@ -14,7 +14,6 @@ type PartCommand struct {
 func (c *PartCommand) Execute() error {
 	cmd, err := c.BuildCommand()
 	if err != nil {
-		c.Client.PrintMessage(err.Error())
 		return err
 	}
 

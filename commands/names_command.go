@@ -14,7 +14,6 @@ type NamesCommand struct {
 func (n *NamesCommand) Execute() error {
 	cmd, err := n.BuildCommand()
 	if err != nil {
-		n.Client.PrintMessage(err.Error())
 		return err
 	}
 

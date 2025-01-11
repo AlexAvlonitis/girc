@@ -13,12 +13,12 @@ type MessageCommand struct {
 func (m *MessageCommand) Execute() error {
 	cmd, err := m.BuildCommand()
 	if err != nil {
-		m.Client.PrintMessage(err.Error())
 		return err
 	}
 
 	m.Client.Write(cmd)
-	// m.Client.PrintMessage("<" + m.Client.Nick() + "> " + m.Input)
+	// irc server does not echo messages
+	m.Client.PrintMessage(":" + m.Client.Nick() + " " + cmd)
 
 	return nil
 }
