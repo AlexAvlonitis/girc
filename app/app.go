@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"girc/app/connection_manager"
 	"girc/commands"
 	"girc/connection"
 	"girc/ui"
@@ -27,15 +28,18 @@ func Init() {
 		return
 	}
 
+	// Create a connection manager, to manage the connection details and channels
+	cm := connection_manager.NewConnectionManager(client)
+
 	// Initialize the ui
-	ui := ui.NewUI(client)
+	ui := ui.NewUI()
 
 	// Set what happens when the user presses Enter on the input
 	ui.MessageInput.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEnter {
 			text := ui.MessageInput.GetText()
 			if len(text) > 0 {
-				commands.SendCommand(text, client)
+				commands.SendCommand(text, cm)
 				// Clear the input field after sending
 				ui.MessageInput.SetText("") // Clear the input field
 			}
@@ -43,7 +47,7 @@ func Init() {
 	})
 
 	// create a message parser, to parse incoming messages from the server
-	msgParser := connection.NewMessageParser(client, ui)
+	msgParser := commands.NewMessageParser(cm, ui)
 
 	// Run the main application loop
 	go func() {

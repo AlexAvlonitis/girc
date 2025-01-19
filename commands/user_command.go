@@ -2,28 +2,28 @@ package commands
 
 import (
 	"errors"
-	"girc/interfaces"
+	"girc/app/connection_manager"
 	"strings"
 )
 
 type UserCommand struct {
-	Input  string
-	Client interfaces.Client
+	Input             string
+	ConnectionManager *connection_manager.DefaultConnectionManager
 }
 
-func (u *UserCommand) Execute() error {
-	cmd, err := u.BuildCommand()
+func (c *UserCommand) Execute() error {
+	cmd, err := c.BuildCommand()
 	if err != nil {
 		return err
 	}
 
-	u.Client.Write(cmd)
+	c.ConnectionManager.Client.Write(cmd)
 
 	return nil
 }
 
-func (u *UserCommand) BuildCommand() (string, error) {
-	parts := strings.Fields(u.Input)
+func (c *UserCommand) BuildCommand() (string, error) {
+	parts := strings.Fields(c.Input)
 
 	if len(parts) > 1 {
 		args := strings.Join(parts[1:], " ")

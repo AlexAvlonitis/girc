@@ -2,22 +2,22 @@ package commands
 
 import (
 	"errors"
-	"girc/interfaces"
+	"girc/app/connection_manager"
 	"strings"
 )
 
 type NickCommand struct {
-	Input  string
-	Client interfaces.Client
+	Input             string
+	ConnectionManager *connection_manager.DefaultConnectionManager
 }
 
-func (n *NickCommand) Execute() error {
-	cmd, err := n.BuildCommand()
+func (c *NickCommand) Execute() error {
+	cmd, err := c.BuildCommand()
 	if err != nil {
 		return err
 	}
 
-	n.Client.Write(cmd)
+	c.ConnectionManager.Client.Write(cmd)
 
 	return nil
 }

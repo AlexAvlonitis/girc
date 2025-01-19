@@ -1,14 +1,14 @@
 package commands
 
-import "girc/interfaces"
+import "girc/app/connection_manager"
 
 type HelpCommand struct {
-	Client interfaces.Client
+	ConnectionManager *connection_manager.DefaultConnectionManager
 }
 
-func (h *HelpCommand) Execute() error {
-	cmd, _ := h.BuildCommand()
-	h.Client.PrintMessage(cmd)
+func (c *HelpCommand) Execute() error {
+	cmd, _ := c.BuildCommand()
+	c.ConnectionManager.Client.PrintMessage(cmd)
 
 	return nil
 }

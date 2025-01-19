@@ -1,7 +1,7 @@
-package connection
+package commands
 
 import (
-	"girc/interfaces"
+	"girc/app/connection_manager"
 	"girc/ui"
 	"strings"
 )
@@ -22,12 +22,12 @@ type Message struct {
 }
 
 type MessageParser struct {
-	Client interfaces.Client
-	Ui     *ui.UI
+	ConnectionManager *connection_manager.DefaultConnectionManager
+	Ui                *ui.UI
 }
 
-func NewMessageParser(c interfaces.Client, ui *ui.UI) *MessageParser {
-	return &MessageParser{Client: c, Ui: ui}
+func NewMessageParser(c *connection_manager.DefaultConnectionManager, ui *ui.UI) *MessageParser {
+	return &MessageParser{ConnectionManager: c, Ui: ui}
 }
 
 // Parse formats the messages received from the server, and categorizes them
@@ -53,16 +53,14 @@ func (p *MessageParser) Parse(msg string) string {
 // pingCallback handles PING messages from the server, and sends a PONG message back
 // to keep the connection alive
 func (p *MessageParser) pingCallback(msg *Message) string {
-	p.Client.SendPong(msg.Args[0])
-
-	return ""
+	return "/pong " + msg.Args[0]
 }
 
 // namesCallback parse the names of the users in a channel
 func (p *MessageParser) namesCallback(msg *Message) string {
 	names := msg.Args[3]
 	for _, name := range strings.Split(names, " ") {
-		p.Client.SetUsers(append(p.Client.Users(), name))
+		p.ConnectionManager.Client.SetUsers(append(p.ConnectionManager.Client.Users(), name))
 		p.Ui.UsersView.AddItem(name, "", 0, nil)
 	}
 	p.Ui.App.Draw()
@@ -72,14 +70,14 @@ func (p *MessageParser) namesCallback(msg *Message) string {
 
 func (p *MessageParser) nickCallback(msg *Message) string {
 	newNick := msg.Args[0]
-	p.Client.SetNick(newNick)
+	p.ConnectionManager.Client.SetNick(newNick)
 
 	return "[green]" + msg.Source + "[-] is now known as " + newNick
 }
 
 func (p *MessageParser) privMsgCallback(msg *Message) string {
 	// check if the message is a private message and directed to the user
-	if msg.Args[0] == p.Client.Nick() {
+	if msg.Args[0] == p.ConnectionManager.Client.Nick() {
 		return "[green]<" + msg.Source + ">[-][yellow](Private)[-] " + msg.Args[1]
 	}
 
@@ -90,16 +88,16 @@ func (p *MessageParser) joinCallback(msg *Message) string {
 	channel := strings.TrimPrefix(msg.Args[0], ":")
 
 	p.Ui.UsersView.Clear()
-	p.Client.SetChannel(channel)
-	p.Client.SetUsers([]string{})
+	p.ConnectionManager.Client.SetChannel(channel)
+	p.ConnectionManager.Client.SetUsers([]string{})
 
 	return "[green]<" + msg.Source + ">[-] has joined the channel " + channel
 }
 
 func (p *MessageParser) partCallback(msg *Message) string {
 	p.Ui.UsersView.Clear()
-	p.Client.SetUsers([]string{})
-	p.Client.SetChannel("")
+	p.ConnectionManager.Client.SetUsers([]string{})
+	p.ConnectionManager.Client.SetChannel("")
 
 	return "[green]<" + msg.Source + ">[-] has left the channel " + msg.Args[0]
 }
@@ -109,7 +107,7 @@ func (p *MessageParser) genericMsgCallback(msg *Message) string {
 		return "[green]<" + msg.Source + ">[-] " + strings.Join(msg.Args[1:], " ")
 	}
 
-	return "[green]<" + p.Client.Nick() + ">[-] " + strings.Join(msg.Args, " ")
+	return "[green]<" + p.ConnectionManager.Client.Nick() + ">[-] " + strings.Join(msg.Args, " ")
 }
 
 // parseMsg Breaks a message from an IRC server into its prefix, command, and arguments

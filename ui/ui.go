@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"girc/interfaces"
-
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -13,12 +11,11 @@ type UI struct {
 	UsersView    *tview.List
 	Grid         *tview.Grid
 	MessageInput *tview.InputField
-	Client       interfaces.Client
 }
 
 // NewUI creates a new UI instance and initializes the components
-func NewUI(c interfaces.Client) *UI {
-	ui := &UI{Client: c}
+func NewUI() *UI {
+	ui := &UI{}
 	ui.App = tview.NewApplication()
 
 	ui.initMessageView()

@@ -2,7 +2,6 @@ package connection
 
 import (
 	"bufio"
-	"girc/commands"
 	"girc/interfaces"
 	"log"
 )
@@ -98,32 +97,12 @@ func (c *DefaultClient) Read() {
 	}()
 }
 
-// SendPong sends a PONG message to the server, to keep the connection alive
-func (c *DefaultClient) SendPong(msg string) {
-	pongCmd := commands.PongCommand{Input: msg, Client: c}
-	err := pongCmd.Execute()
-	if err != nil {
-		log.Printf("Error sending PONG: %s", err)
-	}
-}
-
 // Register sends the NICK and USER commands to the server, to register the client
 func (c *DefaultClient) Register(channel string) error {
 	// Send default NICKname
-	nick := "/nick " + c.Nick()
-	nickCmd := commands.NickCommand{Input: nick, Client: c}
-	err := nickCmd.Execute()
-	if err != nil {
-		return err
-	}
-
-	// Send default USERname
-	user := "/user " + c.User() + " 0 * :" + c.RealName()
-	userCmd := commands.UserCommand{Input: user, Client: c}
-	err = userCmd.Execute()
-	if err != nil {
-		return err
-	}
+	c.Write("NICK " + c.Nick() + "\r\n")
+	// Send default USER command
+	c.Write("USER " + c.User() + " 0 * :" + c.RealName() + "\r\n")
 
 	return nil
 }

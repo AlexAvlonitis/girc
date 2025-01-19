@@ -1,23 +1,25 @@
 package commands
 
 import (
+	"girc/app/connection_manager"
 	"girc/interfaces"
 	"strings"
 )
 
 // SendCommand parses a command and sends the appropriate IRC command
-func SendCommand(input string, client interfaces.Client) {
+func SendCommand(input string, cm *connection_manager.DefaultConnectionManager) {
 	var cmd interfaces.Command
 
 	commandMap := map[string]interfaces.Command{
-		"/join":  &JoinCommand{Input: input, Client: client},
-		"/part":  &PartCommand{Input: input, Client: client},
-		"/nick":  &NickCommand{Input: input, Client: client},
-		"/msg":   &PersonalMessageCommand{Input: input, Client: client},
-		"/names": &NamesCommand{Input: input, Client: client},
-		"/user":  &UserCommand{Input: input, Client: client},
-		"/quit":  &QuitCommand{Input: input, Client: client},
-		"/help":  &HelpCommand{Client: client},
+		"/join":  &JoinCommand{Input: input, ConnectionManager: cm},
+		"/part":  &PartCommand{Input: input, ConnectionManager: cm},
+		"/nick":  &NickCommand{Input: input, ConnectionManager: cm},
+		"/msg":   &PersonalMessageCommand{Input: input, ConnectionManager: cm},
+		"/names": &NamesCommand{Input: input, ConnectionManager: cm},
+		"/user":  &UserCommand{Input: input, ConnectionManager: cm},
+		"/pong":  &PongCommand{Input: input, ConnectionManager: cm},
+		"/quit":  &QuitCommand{Input: input, ConnectionManager: cm},
+		"/help":  &HelpCommand{ConnectionManager: cm},
 	}
 
 	// Check if the input is a command
@@ -26,16 +28,16 @@ func SendCommand(input string, client interfaces.Client) {
 		if command, exists := commandMap[parts[0]]; exists {
 			cmd = command
 		} else {
-			client.PrintMessage("Invalid command, use /help for more commands")
+			cm.Client.PrintMessage("Invalid command, use /help for more commands")
 			return
 		}
 	} else {
-		cmd = &MessageCommand{Input: input, Client: client}
+		cmd = &MessageCommand{Input: input, ConnectionManager: cm}
 	}
 
 	err := cmd.Execute()
 	if err != nil {
 		// Custom error that can be parsed by msg parser
-		client.PrintMessage(":error 999 e :" + err.Error())
+		cm.Client.PrintMessage(":error 999 e :" + err.Error())
 	}
 }

@@ -4,7 +4,6 @@ package interfaces
 type Client interface {
 	Connect() error
 	Read()
-	SendPong(string)
 	Register(string) error
 	Write(string)
 	PrintMessage(string)

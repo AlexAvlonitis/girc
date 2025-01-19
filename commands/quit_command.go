@@ -1,18 +1,18 @@
 package commands
 
 import (
-	"girc/interfaces"
+	"girc/app/connection_manager"
 	"strings"
 )
 
 type QuitCommand struct {
-	Input  string
-	Client interfaces.Client
+	Input             string
+	ConnectionManager *connection_manager.DefaultConnectionManager
 }
 
 func (c *QuitCommand) Execute() error {
 	cmd, _ := c.BuildCommand()
-	c.Client.Write(cmd)
+	c.ConnectionManager.Client.Write(cmd)
 
 	return nil
 }

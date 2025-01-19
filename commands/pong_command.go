@@ -1,23 +1,21 @@
 package commands
 
-import (
-	"girc/interfaces"
-)
+import "girc/app/connection_manager"
 
 type PongCommand struct {
-	Input  string
-	Client interfaces.Client
+	Input             string
+	ConnectionManager *connection_manager.DefaultConnectionManager
 }
 
-func (p *PongCommand) Execute() error {
-	cmd, _ := p.BuildCommand()
-	p.Client.Write(cmd)
+func (c *PongCommand) Execute() error {
+	cmd, _ := c.BuildCommand()
+	c.ConnectionManager.Client.Write(cmd)
 
 	return nil
 }
 
-func (p *PongCommand) BuildCommand() (string, error) {
-	cmd := "PONG " + p.Input
+func (c *PongCommand) BuildCommand() (string, error) {
+	cmd := "PONG " + c.Input
 
 	return cmd, nil
 }

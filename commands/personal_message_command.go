@@ -2,13 +2,13 @@ package commands
 
 import (
 	"errors"
-	"girc/interfaces"
+	"girc/app/connection_manager"
 	"strings"
 )
 
 type PersonalMessageCommand struct {
-	Input  string
-	Client interfaces.Client
+	Input             string
+	ConnectionManager *connection_manager.DefaultConnectionManager
 }
 
 func (c *PersonalMessageCommand) Execute() error {
@@ -17,15 +17,15 @@ func (c *PersonalMessageCommand) Execute() error {
 		return err
 	}
 
-	c.Client.Write(cmd)
+	c.ConnectionManager.Client.Write(cmd)
 	// irc does not echo personal messages
-	c.Client.PrintMessage(":" + c.Client.Nick() + " " + cmd)
+	c.ConnectionManager.Client.PrintMessage(":" + c.ConnectionManager.Client.Nick() + " " + cmd)
 
 	return nil
 }
 
 func (c *PersonalMessageCommand) BuildCommand() (string, error) {
-	if c.Client.Channel() == "" {
+	if c.ConnectionManager.Client.Channel() == "" {
 		return "", errors.New("you need to join a channel first")
 	}
 

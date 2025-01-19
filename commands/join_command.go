@@ -2,28 +2,28 @@ package commands
 
 import (
 	"errors"
-	"girc/interfaces"
+	"girc/app/connection_manager"
 	"strings"
 )
 
 type JoinCommand struct {
-	Input  string
-	Client interfaces.Client
+	Input             string
+	ConnectionManager *connection_manager.DefaultConnectionManager
 }
 
-func (j *JoinCommand) Execute() error {
-	cmd, err := j.BuildCommand()
+func (c *JoinCommand) Execute() error {
+	cmd, err := c.BuildCommand()
 	if err != nil {
 		return err
 	}
 
-	j.Client.Write(cmd)
+	c.ConnectionManager.Client.Write(cmd)
 
 	return nil
 }
 
-func (j *JoinCommand) BuildCommand() (string, error) {
-	parts := strings.Split(j.Input, " ")
+func (c *JoinCommand) BuildCommand() (string, error) {
+	parts := strings.Split(c.Input, " ")
 
 	if len(parts) > 1 {
 		args := strings.Join(parts[1:], " ")

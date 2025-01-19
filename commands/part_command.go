@@ -2,13 +2,13 @@ package commands
 
 import (
 	"errors"
-	"girc/interfaces"
+	"girc/app/connection_manager"
 	"strings"
 )
 
 type PartCommand struct {
-	Input  string
-	Client interfaces.Client
+	Input             string
+	ConnectionManager *connection_manager.DefaultConnectionManager
 }
 
 func (c *PartCommand) Execute() error {
@@ -17,7 +17,7 @@ func (c *PartCommand) Execute() error {
 		return err
 	}
 
-	c.Client.Write(cmd)
+	c.ConnectionManager.Client.Write(cmd)
 
 	return nil
 }
