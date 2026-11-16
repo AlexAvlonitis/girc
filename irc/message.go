@@ -7,14 +7,6 @@ import (
 	"strings"
 )
 
-// Numeric replies handled by the client.
-const (
-	RplWelcome       = "001"
-	RplNamReply      = "353"
-	RplEndOfNames    = "366"
-	ErrNicknameInUse = "433"
-)
-
 // Message is a single IRC protocol message.
 //
 //	:nick!user@host PRIVMSG #channel :Hello there
@@ -125,4 +117,40 @@ func (m Message) String() string {
 // IsChannel reports whether name looks like a channel name.
 func IsChannel(name string) bool {
 	return name != "" && strings.ContainsRune("#&+!", rune(name[0]))
+}
+
+// rfc1459Lower implements the extra case folding of the rfc1459 case mapping,
+// in which []\~ are the upper case forms of {}|^.
+var rfc1459Lower = strings.NewReplacer("[", "{", "]", "}", "\\", "|", "~", "^")
+
+// Fold returns the case-folded form of a nickname or channel name, suitable
+// for comparisons and map keys.
+func Fold(name string) string {
+	return rfc1459Lower.Replace(strings.ToLower(name))
+}
+
+// EqualFold reports whether two nicknames or channel names are equal under
+// IRC case mapping.
+func EqualFold(a, b string) bool {
+	return Fold(a) == Fold(b)
+}
+
+const ctcpDelim = "\x01"
+
+// CTCP encodes a CTCP request or reply to be sent in a PRIVMSG or NOTICE.
+func CTCP(command, args string) string {
+	if args == "" {
+		return ctcpDelim + command + ctcpDelim
+	}
+	return ctcpDelim + command + " " + args + ctcpDelim
+}
+
+// ParseCTCP decodes a CTCP message. ok is false if text is not CTCP.
+func ParseCTCP(text string) (command, args string, ok bool) {
+	if !strings.HasPrefix(text, ctcpDelim) {
+		return "", "", false
+	}
+	text = strings.TrimSuffix(text[1:], ctcpDelim)
+	command, args, _ = strings.Cut(text, " ")
+	return strings.ToUpper(command), args, command != ""
 }

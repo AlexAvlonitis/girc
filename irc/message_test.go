@@ -116,3 +116,38 @@ func TestIsNumeric(t *testing.T) {
 		}
 	}
 }
+
+func TestFold(t *testing.T) {
+	if !EqualFold("Nick[a]", "nick{A}") {
+		t.Error(`EqualFold("Nick[a]", "nick{A}") = false`)
+	}
+	if EqualFold("nick", "nick_") {
+		t.Error(`EqualFold("nick", "nick_") = true`)
+	}
+}
+
+func TestCTCP(t *testing.T) {
+	if got := CTCP("ACTION", "waves"); got != "\x01ACTION waves\x01" {
+		t.Errorf("CTCP = %q", got)
+	}
+	if got := CTCP("VERSION", ""); got != "\x01VERSION\x01" {
+		t.Errorf("CTCP = %q", got)
+	}
+
+	tests := []struct {
+		text, cmd, args string
+		ok              bool
+	}{
+		{"\x01ACTION waves hello\x01", "ACTION", "waves hello", true},
+		{"\x01version\x01", "VERSION", "", true},
+		{"\x01PING 123", "PING", "123", true}, // missing closing delimiter
+		{"hello", "", "", false},
+		{"\x01\x01", "", "", false},
+	}
+	for _, tt := range tests {
+		cmd, args, ok := ParseCTCP(tt.text)
+		if cmd != tt.cmd || args != tt.args || ok != tt.ok {
+			t.Errorf("ParseCTCP(%q) = %q, %q, %v; want %q, %q, %v", tt.text, cmd, args, ok, tt.cmd, tt.args, tt.ok)
+		}
+	}
+}
