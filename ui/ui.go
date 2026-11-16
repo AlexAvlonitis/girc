@@ -1,105 +1,125 @@
+// Package ui implements the terminal user interface.
 package ui
 
 import (
+	"fmt"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
+const maxInputLength = 400
+
+// UI is the terminal interface: a message log, a user list and an input line.
+// Println and SetUsers are safe to call from any goroutine.
 type UI struct {
-	App          *tview.Application
-	MessageView  *tview.TextView
-	UsersView    *tview.List
-	Grid         *tview.Grid
-	MessageInput *tview.InputField
+	app      *tview.Application
+	messages *tview.TextView
+	users    *tview.List
+	input    *tview.InputField
+	onSubmit func(string)
 }
 
-// NewUI creates a new UI instance and initializes the components
-func NewUI() *UI {
-	ui := &UI{}
-	ui.App = tview.NewApplication()
+// New builds the interface. onSubmit is called on the UI goroutine with
+// each line the user enters.
+func New(title string, onSubmit func(string)) *UI {
+	u := &UI{
+		app:      tview.NewApplication(),
+		onSubmit: onSubmit,
+	}
 
-	ui.initMessageView()
-	ui.initUsersView()
-	ui.setupUsersViewInputCapture()
-	ui.initMessageInput()
-	ui.initGrid()
-	ui.setupInputCapture()
-
-	return ui
-}
-
-// initMessageView initializes the TextView to display messages
-func (ui *UI) initMessageView() {
-	ui.MessageView = tview.NewTextView().
+	u.messages = tview.NewTextView().
 		SetDynamicColors(true).
-		SetRegions(true).
-		SetWordWrap(true).
-		SetChangedFunc(func() {
-			ui.App.Draw() // Redraw the application when the text changes
-			ui.MessageView.ScrollToEnd()
-		})
+		SetWordWrap(true)
+	u.messages.SetBorder(true).SetTitle(title)
 
-	ui.MessageView.SetBorder(true).SetTitle("GIRC Client")
-}
-
-// initUsersView initializes the ListView to display a list of users
-func (ui *UI) initUsersView() {
-	ui.UsersView = tview.NewList().
+	u.users = tview.NewList().
 		ShowSecondaryText(false).
 		SetMainTextColor(tcell.ColorGreen)
-
-	ui.UsersView.SetBorder(true).SetTitle("Users")
-}
-
-// setupUsersViewInputCapture sets up keyboard event handling for the UsersView
-// When Enter is pressed, the selected user's name is inserted into the MessageInput
-func (ui *UI) setupUsersViewInputCapture() {
-	ui.UsersView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if event.Key() == tcell.KeyEnter {
-			username, _ := ui.UsersView.GetItemText(ui.UsersView.GetCurrentItem())
-			ui.MessageInput.SetText("/msg " + username + " ")
-			ui.App.SetFocus(ui.MessageInput)
-		}
-		return event
+	u.users.SetBorder(true).SetTitle("Users")
+	// Selecting a user starts a private message to them.
+	u.users.SetSelectedFunc(func(_ int, nick, _ string, _ rune) {
+		u.input.SetText("/msg " + nick + " ")
+		u.app.SetFocus(u.input)
 	})
-}
 
-// initMessageInput initializes the InputField for user input
-func (ui *UI) initMessageInput() {
-	ui.MessageInput = tview.NewInputField().
+	u.input = tview.NewInputField().
 		SetLabel("Input: ").
 		SetFieldWidth(0).
-		SetAcceptanceFunc(tview.InputFieldMaxLength(170))
-}
+		SetAcceptanceFunc(tview.InputFieldMaxLength(maxInputLength))
+	u.input.SetDoneFunc(func(key tcell.Key) {
+		if key != tcell.KeyEnter {
+			return
+		}
+		text := u.input.GetText()
+		if text == "" {
+			return
+		}
+		u.input.SetText("")
+		u.onSubmit(text)
+	})
 
-// initGrid initializes the Grid layout to arrange the components
-func (ui *UI) initGrid() {
-	ui.Grid = tview.NewGrid().
+	grid := tview.NewGrid().
 		SetRows(0, 3).
 		SetColumns(0, 30).
-		AddItem(ui.MessageView, 0, 0, 1, 1, 0, 0, true).
-		AddItem(ui.UsersView, 0, 1, 1, 1, 0, 0, false).
-		AddItem(ui.MessageInput, 1, 0, 1, 2, 0, 0, false)
+		AddItem(u.messages, 0, 0, 1, 1, 0, 0, false).
+		AddItem(u.users, 0, 1, 1, 1, 0, 0, false).
+		AddItem(u.input, 1, 0, 1, 2, 0, 0, true)
+
+	u.app.SetRoot(grid, true).SetFocus(u.input)
+	u.app.SetInputCapture(u.handleKey)
+
+	return u
 }
 
-// setupInputCapture sets up keyboard event handling
-func (ui *UI) setupInputCapture() {
-	ui.App.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		switch event.Key() {
-		case tcell.KeyTab: // Tab key
-			// When Tab is pressed, move the focus to the next widget
-			if ui.App.GetFocus() == ui.MessageView {
-				ui.App.SetFocus(ui.UsersView)
-			} else if ui.App.GetFocus() == ui.UsersView {
-				ui.App.SetFocus(ui.MessageInput)
-			} else {
-				ui.App.SetFocus(ui.MessageView)
-			}
-		case tcell.KeyCtrlC: // Ctrl+C to quit the application
-			// Stop the application on Ctrl+C
-			ui.App.Stop()
-		}
-		// Return the event to allow tview to handle other keys
+// handleKey implements global shortcuts. Tab cycles focus between widgets.
+func (u *UI) handleKey(event *tcell.EventKey) *tcell.EventKey {
+	if event.Key() != tcell.KeyTab {
 		return event
+	}
+	switch u.app.GetFocus() {
+	case u.input:
+		u.app.SetFocus(u.messages)
+	case u.messages:
+		u.app.SetFocus(u.users)
+	default:
+		u.app.SetFocus(u.input)
+	}
+	return nil
+}
+
+// Run starts the event loop and blocks until Stop is called or the user
+// presses Ctrl+C.
+func (u *UI) Run() error {
+	return u.app.Run()
+}
+
+// Stop terminates the event loop.
+func (u *UI) Stop() {
+	u.app.Stop()
+}
+
+// Println appends a line to the message log. The line may contain tview
+// color tags; untrusted text must be passed through Escape first.
+func (u *UI) Println(line string) {
+	u.app.QueueUpdateDraw(func() {
+		fmt.Fprintln(u.messages, line)
+		u.messages.ScrollToEnd()
 	})
+}
+
+// SetUsers replaces the contents of the user list.
+func (u *UI) SetUsers(nicks []string) {
+	u.app.QueueUpdateDraw(func() {
+		u.users.Clear()
+		for _, nick := range nicks {
+			u.users.AddItem(nick, "", 0, nil)
+		}
+	})
+}
+
+// Escape escapes text so that it is displayed literally rather than being
+// interpreted as color or region tags.
+func Escape(text string) string {
+	return tview.Escape(text)
 }

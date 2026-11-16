@@ -5,3 +5,5 @@ nick: "girc"
 user: "girc"
 realName: "girc Client"
 ssl: false
+# Skip TLS certificate verification (only for trusted self-signed servers).
+insecureSkipVerify: false

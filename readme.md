@@ -10,8 +10,25 @@ A simple irc client in go
 # once
 go install
 
-go run .
+go run .                       # uses ./config.yaml
+go run . -config other.yaml
+go test ./...
 ```
+
+## Commands
+| Command | Description |
+| --- | --- |
+| `/join #channel [key]` | join a channel |
+| `/part [#channel] [reason]` | leave a channel (defaults to the current one) |
+| `/nick newnick` | change your nickname |
+| `/msg nickname message` | send a private message |
+| `/names [#channel]` | list the users in a channel |
+| `/quit [reason]` | quit the server |
+| `/help` | show the command list |
+
+Any other text is sent to the current channel. `Tab` cycles focus between the
+message log, the user list and the input; pressing `Enter` on a user starts a
+private message to them.
 
 ## Preview
 
